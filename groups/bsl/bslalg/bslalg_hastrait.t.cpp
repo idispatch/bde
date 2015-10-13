@@ -17,14 +17,14 @@
 #include <bslmf_istriviallydefaultconstructible.h>
 #include <bslmf_nestedtraitdeclaration.h>
 
+#include <bsls_bsltestutil.h>
 #include <bsls_objectbuffer.h>
 #include <bsls_platform.h>
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>      // 'printf'
+#include <stdlib.h>     // 'atoi'
 
 using namespace BloombergLP;
-using namespace std;
 
 //=============================================================================
 //                             TEST PLAN
@@ -43,51 +43,53 @@ using namespace std;
 // 'bslalg::HasTrait'.
 //-----------------------------------------------------------------------------
 // [1] BREATHING TEST
-//==========================================================================
-//                      STANDARD BDE ASSERT TEST MACRO
-//--------------------------------------------------------------------------
-static int testStatus = 0;
+
+// ============================================================================
+//                     STANDARD BSL ASSERT TEST FUNCTION
+// ----------------------------------------------------------------------------
 
 namespace {
 
-void aSsErT(int c, const char *s, int i) {
-    if (c) {
-        printf("Error " __FILE__ "(%d): %s    (failed)\n", i, s);
-        if (testStatus >= 0 && testStatus <= 100) ++testStatus;
+int testStatus = 0;
+
+void aSsErT(bool condition, const char *message, int line)
+{
+    if (condition) {
+        printf("Error " __FILE__ "(%d): %s    (failed)\n", line, message);
+
+        if (0 <= testStatus && testStatus <= 100) {
+            ++testStatus;
+        }
     }
 }
 
 }  // close unnamed namespace
 
-# define ASSERT(X) { aSsErT(!(X), #X, __LINE__); }
+// ============================================================================
+//               STANDARD BSL TEST DRIVER MACRO ABBREVIATIONS
+// ----------------------------------------------------------------------------
 
-//=============================================================================
-//                  STANDARD BDE LOOP-ASSERT TEST MACROS
-//-----------------------------------------------------------------------------
-# define LOOP_ASSERT(I,X) \
-    if (!(X)) { printf("%s = %s\n", #I, (I)); aSsErT(!(X), #X, __LINE__); }
+#define ASSERT       BSLS_BSLTESTUTIL_ASSERT
+#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
 
-# define LOOP2_ASSERT(I,J,X) \
-    if (!(X)) { printf("%s = %s, %s = %d\n", #I, (I), #J, (J));  \
-                aSsErT(!(X), #X, __LINE__); }
+#define LOOP_ASSERT  BSLS_BSLTESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLS_BSLTESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLS_BSLTESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLS_BSLTESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLS_BSLTESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLS_BSLTESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLS_BSLTESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLS_BSLTESTUTIL_LOOP6_ASSERT
 
-//=============================================================================
-//                  SEMI-STANDARD TEST OUTPUT MACROS
-//-----------------------------------------------------------------------------
-// #define P(X) printf("%s = %d\n", #X, (X)); // Print identifier and value.
-#define Q(X) printf("<| " #X " |>\n");  // Quote identifier literally.
-#define L_ __LINE__                           // current Line number
-#define T_ printf("\t");             // Print a tab (w/o newline)
+#define Q            BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
+#define P            BSLS_BSLTESTUTIL_P   // Print identifier and value.
+#define P_           BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLS_BSLTESTUTIL_L_  // current Line number
 
 //=============================================================================
 //                  GLOBAL TYPEDEFS/CONSTANTS FOR TESTING
 //-----------------------------------------------------------------------------
-
-enum { VERBOSE_ARG_NUM = 2, VERY_VERBOSE_ARG_NUM, VERY_VERY_VERBOSE_ARG_NUM };
-
-int verbose = 0;
-int veryVerbose = 0;
-int veryVeryVerbose = 0;
 
 //=============================================================================
 //                  GLOBAL HELPER FUNCTIONS FOR TESTING
@@ -112,7 +114,7 @@ const unsigned TRAIT_POD = (TRAIT_BITWISEMOVEABLE |
 const unsigned TRAIT_EQPOD = (TRAIT_POD |
                               TRAIT_BITWISEEQUALITYCOMPARABLE);
 
-template <typename TYPE>
+template <class TYPE>
 unsigned traitBits()
 {
     unsigned result = TRAIT_NIL;
@@ -142,14 +144,15 @@ unsigned traitBits()
             ? TRAIT_HASSTLITERATORS
             : 0;
 
-    result |= bslalg::HasTrait<TYPE, bslalg::TypeTraitHasPointerSemantics>::VALUE
+    result |= bslalg::HasTrait<TYPE,
+                               bslalg::TypeTraitHasPointerSemantics>::VALUE
             ? TRAIT_HASPOINTERSEMANTICS
             : 0;
 
     return result;
 }
 
-template <typename TYPE>
+template <class TYPE>
 struct Identity
 {
     // Use this struct to convert a cast-style type (e.g., 'void (*)(int)')
@@ -189,12 +192,26 @@ struct my_Class1
 };
 
 namespace BloombergLP {
+namespace bslmf {
+
+// Being empty, 'my_Class0' would normally be implicitly bitwise moveable.
+// Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class0> : bsl::false_type { };
+
+// Being empty, 'my_Class1' would normally be implicitly bitwise moveable.
+// Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class1> : bsl::false_type { };
+
+}  // close bslmf namespace
+
 namespace bslma {
 
 template <>
 struct UsesBslmaAllocator<my_Class1> : bsl::true_type { };
 
-}  // close bslma namespace
+}  // close namespace bslma
 }  // close enterprise namespace
 
 template <class T>
@@ -227,16 +244,30 @@ struct ConvertibleToAnyNoTraits
     // the "convert to anything" operator shouldn't interfere with the nested
     // trait logic.
 {
-    template <typename T>
+    template <class T>
     operator T() const { return T(); }
 };
 
 struct ConvertibleToAnyWithTraits {
-    template <typename T>
+    template <class T>
     operator T() const { return T(); }
 };
 
 namespace BloombergLP {
+namespace bslmf {
+
+// Being empty, 'my_Class4' would normally be implicitly bitwise
+// moveable.  Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class4> : bsl::false_type { };
+
+// Being empty, 'ConvertibleToAnyNoTraits' would normally be implicitly bitwise
+// moveable.  Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<ConvertibleToAnyNoTraits> : bsl::false_type { };
+
+}  // close namespace bslmf
+
 namespace bslma {
 
 template <>
@@ -246,8 +277,8 @@ struct UsesBslmaAllocator<ConvertibleToAnyWithTraits> : bsl::true_type {
     // work.
 };
 
-}
-}
+}  // close namespace bslma
+}  // close enterprise namespace
 
 //=============================================================================
 //                              MAIN PROGRAM
@@ -255,10 +286,15 @@ struct UsesBslmaAllocator<ConvertibleToAnyWithTraits> : bsl::true_type {
 
 int main(int argc, char *argv[])
 {
-    int test = argc > 1 ? atoi(argv[1]) : 0;
-    verbose = argc > 2;
-    veryVerbose = argc > 3;
-    veryVeryVerbose = argc > 4;
+    int                 test = argc > 1 ? atoi(argv[1]) : 0;
+    bool             verbose = argc > 2;
+    bool         veryVerbose = argc > 3;
+    bool     veryVeryVerbose = argc > 4;
+    bool veryVeryVeryVerbose = argc > 5;
+
+    (void)veryVerbose;          // suppress warning
+    (void)veryVeryVerbose;      // suppress warning
+    (void)veryVeryVeryVerbose;  // suppress warning
 
     setbuf(stdout, NULL);    // Use unbuffered output
 
@@ -324,7 +360,8 @@ int main(int argc, char *argv[])
 
         // Trait tests for type convertible to anything
         TRAIT_TEST(ConvertibleToAnyNoTraits, TRAIT_NIL);
-        TRAIT_TEST(ConvertibleToAnyWithTraits, TRAIT_USESBSLMAALLOCATOR);
+        TRAIT_TEST(ConvertibleToAnyWithTraits,
+                   TRAIT_USESBSLMAALLOCATOR | TRAIT_BITWISEMOVEABLE);
 
       } break;
 

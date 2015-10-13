@@ -41,7 +41,7 @@ BSLS_IDENT("$Id: $")
 //  template <class VALUE_TYPE, class KEY_EXTRACTOR>
 //  void mySort(VALUE_TYPE *begin, VALUE_TYPE *end, const KEY_EXTRACTOR&)
 //      // This function provides an order-preserving sort of the items in the
-//      // range '[ begin, end )', where 'KEY_EXTRACTOR::extractKey' yields the
+//      // range '[begin .. end)', where 'KEY_EXTRACTOR::extractKey' yields the
 //      // key being sorted over.  We require that 'VALUE_TYPE' support copy
 //      // construction and assignment.
 //  {
@@ -57,7 +57,7 @@ BSLS_IDENT("$Id: $")
 //              }
 //          }
 //
-//          // '*end' is now the highest element in the range '[ begin, end ]',
+//          // '*end' is now the highest element in the range '[begin .. end]',
 //          // so we only have to sort the elements before it in the next pass.
 //      }
 //  }
@@ -132,7 +132,7 @@ BSLS_IDENT("$Id: $")
 //..
 //  List of students, lowest GPA first:
 //  ===================================
-//  Name   GPA  AGE
+//                              Name   GPA  AGE
 //  -----  ---  ---
 //  Stan   1.9   18
 //  Ann    2.3   21
@@ -171,7 +171,7 @@ BSLS_IDENT("$Id: $")
 //..
 //  List of students, youngest first:
 //  ================================
-//  Name   GPA  AGE
+//                              Name   GPA  AGE
 //  -----  ---  ---
 //  Stan   1.9   18
 //  Phil   3.4   19
@@ -244,9 +244,9 @@ struct UnorderedSetKeyConfiguration {
         // is simply the object itself.
 };
 
-// ===========================================================================
+// ============================================================================
 //                  TEMPLATE AND INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                       //------------------------------------
                       // struct UnorderedSetKeyConfiguration
@@ -261,7 +261,7 @@ UnorderedSetKeyConfiguration<VALUE_TYPE>::extractKey(const VALUE_TYPE& object)
     return object;
 }
 
-}  // close namespace bslalg
+}  // close package namespace
 
 }  // close enterprise namespace
 

@@ -114,7 +114,7 @@ using namespace bsl;  // automatically added by script
 // [ 7] basic_string basic_string::operator+=(const StringRefData& strRf);
 // [ 8] bsl::hash<BloombergLP::bslstl::StringRef>
 // [ 8] bslh::Hash<>
-//--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // [ 1] BREATHING TEST
 // [10] USAGE
 
@@ -200,7 +200,7 @@ static bool veryVeryVeryVerbose;
 //-----------------------------------------------------------------------------
 typedef bslstl::StringRef Obj;
 
-template <typename CHAR>
+template <class CHAR>
 struct TestData
 {
     static CHAR const * emptyString;
@@ -503,7 +503,7 @@ void TestDriver<CHAR_TYPE>::testCase9()
 // algorithm.  This delegation is made possible by the STL-compatible iterators
 // provided by the 'begin' and 'end' accessors.
 
-template <typename CHAR>
+template <class CHAR>
 void testBasicAccessors(bool verbose)
 {
     if (verbose) std::cout << "\nTESTING BASIC ACCESSORS"
@@ -528,6 +528,7 @@ void testBasicAccessors(bool verbose)
         ASSERT(ES.end()     == TestData<CHAR>::emptyString);
         ASSERT(ES.length()  ==
            native_std::char_traits<CHAR>::length(TestData<CHAR>::emptyString));
+        ASSERT(ES.empty());
         ASSERT(ES.isEmpty());
 
         bsl::basic_string<CHAR> EString(TestData<CHAR>::emptyString);
@@ -547,6 +548,7 @@ void testBasicAccessors(bool verbose)
         ASSERT(NES.data()    == NES.begin());
         ASSERT(NES.end()     == TestData<CHAR>::nonEmptyString + LEN);
         ASSERT(NES.length()  == LEN);
+        ASSERT(!NES.empty());
         ASSERT(!NES.isEmpty());
 
         bsl::basic_string<CHAR> NEString(TestData<CHAR>::nonEmptyString);
@@ -2663,7 +2665,7 @@ int main(int argc, char *argv[])
         //
         // Concerns:
         //   Object created from the ty string, non-empty string and substring
-        //   stream correctly.
+        //   stream correctly.  Width reset after output.
         //
         // Plan:
         //   For an empty string, non-empty string and substring, use
@@ -2788,6 +2790,22 @@ int main(int argc, char *argv[])
                  << std::setw(static_cast<int>(NES.length() + 10))
                  << NES;
           ASSERT(fmtOut.str() == bsl::string(10, '?') + NES);
+
+          fmtOut.str(bsl::string());
+          fmtOut << std::left
+                 << std::setfill('?')
+                 << std::setw(static_cast<int>(NES.length() + 10))
+                 << NES
+                 << NES;
+          ASSERT(fmtOut.str() == NES + bsl::string(10, '?') + NES);
+
+          fmtOut.str(bsl::string());
+          fmtOut << std::right
+                 << std::setfill('?')
+                 << std::setw(static_cast<int>(NES.length() + 10))
+                 << NES
+                 << NES;
+          ASSERT(fmtOut.str() == bsl::string(10, '?') + NES + NES);
         }
       } break;
       case 3: {
@@ -2807,6 +2825,7 @@ int main(int argc, char *argv[])
         //      const_iterator data() const;
         //      const_iterator end() const;
         //      int            length() const;
+        //      int            empty() const;
         //      int            isEmpty() const;
         //      int            compare(other) const;
         //                     operator bsl::string() const;

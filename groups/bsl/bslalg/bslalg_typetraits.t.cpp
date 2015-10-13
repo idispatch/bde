@@ -2,22 +2,24 @@
 #include <bslalg_typetraits.h>
 
 #include <bslma_testallocator.h>
+
 #include <bslmf_isconvertible.h>
 #include <bslmf_metaint.h>
 #include <bslmf_removecvq.h>
 #include <bslmf_if.h>
+
+#include <bsls_bsltestutil.h>
 #include <bsls_objectbuffer.h>
 #include <bsls_platform.h>
 #include <bsls_types.h>
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>      // 'printf'
+#include <stdlib.h>     // 'atoi'
 
 #include <new>
 #include <utility>
 
 using namespace BloombergLP;
-using namespace std;
 
 //=============================================================================
 //                             TEST PLAN
@@ -30,52 +32,52 @@ using namespace std;
 // reused systematically.
 //-----------------------------------------------------------------------------
 
-//==========================================================================
-//                  STANDARD BDE ASSERT TEST MACRO
-//--------------------------------------------------------------------------
-// NOTE: THIS IS A LOW-LEVEL COMPONENT AND MAY NOT USE ANY C++ LIBRARY
-// FUNCTIONS, INCLUDING IOSTREAMS.
-static int testStatus = 0;
+// ============================================================================
+//                     STANDARD BSL ASSERT TEST FUNCTION
+// ----------------------------------------------------------------------------
 
 namespace {
 
-void aSsErT(int c, const char *s, int i) {
-    if (c) {
-        printf("Error " __FILE__ "(%d): %s    (failed)\n", i, s);
-        if (testStatus >= 0 && testStatus <= 100) ++testStatus;
+int testStatus = 0;
+
+void aSsErT(bool condition, const char *message, int line)
+{
+    if (condition) {
+        printf("Error " __FILE__ "(%d): %s    (failed)\n", line, message);
+
+        if (0 <= testStatus && testStatus <= 100) {
+            ++testStatus;
+        }
     }
 }
 
 }  // close unnamed namespace
 
-# define ASSERT(X) { aSsErT(!(X), #X, __LINE__); }
+// ============================================================================
+//               STANDARD BSL TEST DRIVER MACRO ABBREVIATIONS
+// ----------------------------------------------------------------------------
 
-# define LOOP_ASSERT(I,X) \
-    if (!(X)) { printf("%s = %s\n", #I, (I)); aSsErT(!(X), #X, __LINE__); }
+#define ASSERT       BSLS_BSLTESTUTIL_ASSERT
+#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
 
-# define LOOP2_ASSERT(I,J,X) \
-    if (!(X)) { printf("%s = %s, %s = %d\n", #I, (I), #J, (J));  \
-                aSsErT(!(X), #X, __LINE__); }
+#define LOOP_ASSERT  BSLS_BSLTESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLS_BSLTESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLS_BSLTESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLS_BSLTESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLS_BSLTESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLS_BSLTESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLS_BSLTESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLS_BSLTESTUTIL_LOOP6_ASSERT
 
-//--------------------------------------------------------------------------
-
-//=============================================================================
-//                  SEMI-STANDARD TEST OUTPUT MACROS
-//-----------------------------------------------------------------------------
-// #define P(X) printf("%s = %d\n", #X, (X)); // Print identifier and value.
-#define Q(X) printf("<| " #X " |>\n");  // Quote identifier literally.
-#define L_ __LINE__                           // current Line number
-#define T_ printf("\t");             // Print a tab (w/o newline)
+#define Q            BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
+#define P            BSLS_BSLTESTUTIL_P   // Print identifier and value.
+#define P_           BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLS_BSLTESTUTIL_L_  // current Line number
 
 //=============================================================================
 //                  GLOBAL TYPEDEFS/CONSTANTS FOR TESTING
 //-----------------------------------------------------------------------------
-
-enum { VERBOSE_ARG_NUM = 2, VERY_VERBOSE_ARG_NUM, VERY_VERY_VERBOSE_ARG_NUM };
-
-int verbose = 0;
-int veryVerbose = 0;
-int veryVeryVerbose = 0;
 
 //=============================================================================
 //                  GLOBAL HELPER FUNCTIONS FOR TESTING
@@ -100,7 +102,7 @@ const unsigned TRAIT_EQPOD = (TRAIT_POD |
                               TRAIT_BITWISEEQUALITYCOMPARABLE);
 
 // Traits detection
-template <typename TYPE, typename TRAIT>
+template <class TYPE, class TRAIT>
 struct HasTrait {
     enum {
         VALUE = TRAIT::template Metafunction<TYPE>::value
@@ -110,7 +112,7 @@ struct HasTrait {
 };
 
 // Traits bit vector
-template <typename TYPE>
+template <class TYPE>
 unsigned traitBits()
 {
     unsigned result = TRAIT_NIL;
@@ -140,7 +142,7 @@ unsigned traitBits()
     return result;
 }
 
-template <typename TYPE>
+template <class TYPE>
 struct Identity {
     // Use this struct to convert a cast-style type (e.g., 'void (*)(int)')
     // into a named type (e.g., 'void (*Type)(int)').
@@ -179,11 +181,25 @@ struct my_Class1
 };
 
 namespace BloombergLP {
+namespace bslmf {
+
+// Being empty, 'my_Class0' would normally be implicitly bitwise moveable.
+// Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class0> : bsl::false_type { };
+
+// Being empty, 'my_Class1' would normally be implicitly bitwise moveable.
+// Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class1> : bsl::false_type { };
+
+}  // close bslmf namespace
+
 namespace bslma {
 
 template <> struct UsesBslmaAllocator<my_Class1> : bsl::true_type { };
 
-}  // close bslma namespace
+}  // close namespace bslma
 }  // close enterprise namespace
 
 template <class T>
@@ -209,8 +225,19 @@ enum my_Enum
     MY_ENUM_0
 };
 
+namespace BloombergLP {
+namespace bslmf {
+
+// Being empty, 'my_Class4' would normally be implicitly bitwise moveable.
+// Override, making it explicitly NOT bitwise moveable.
+template <>
+struct IsBitwiseMoveable<my_Class4> : bsl::false_type { };
+
+}  // close bslmf namespace
+}  // close enterprise namespace
+
 //=============================================================================
-//                  USAGE EXAMPLE
+//                              USAGE EXAMPLE
 //-----------------------------------------------------------------------------
 namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
 
@@ -361,7 +388,7 @@ namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
 // With these utilities, we can now implement 'MyGenericContainer'.
 //..
     // CREATORS
-    template <typename TYPE>
+    template <class TYPE>
     MyGenericContainer<TYPE>::MyGenericContainer(const TYPE&       object,
                                                  bslma::Allocator *allocator)
     {
@@ -370,7 +397,7 @@ namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
                                                allocator);
     }
 
-    template <typename TYPE>
+    template <class TYPE>
     MyGenericContainer<TYPE>::MyGenericContainer(
                                           const MyGenericContainer&  container,
                                           bslma::Allocator          *allocator)
@@ -383,7 +410,7 @@ namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
 // Note that all this machinery only affects the constructors, and not the
 // destructor which only invokes the destructor of 'd_object'.
 //..
-    template <typename TYPE>
+    template <class TYPE>
     MyGenericContainer<TYPE>::~MyGenericContainer()
     {
         (&d_object.object())->~TYPE();
@@ -392,14 +419,14 @@ namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
 // To finish, the accessors and manipulators are trivially implemented.
 //..
     // MANIPULATORS
-    template <typename TYPE>
+    template <class TYPE>
     TYPE& MyGenericContainer<TYPE>::object()
     {
         return d_object.object();
     }
 
     // ACCESSORS
-    template <typename TYPE>
+    template <class TYPE>
     const TYPE& MyGenericContainer<TYPE>::object() const
     {
         return d_object.object();
@@ -489,17 +516,22 @@ namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE {
     }
 //..
 
-} // close namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE
+}  // close namespace BSLALG_TYPETRAITS_USAGE_EXAMPLE
 //=============================================================================
 //                              MAIN PROGRAM
 //-----------------------------------------------------------------------------
 
 int main(int argc, char *argv[])
 {
-    int test = argc > 1 ? atoi(argv[1]) : 0;
-    verbose = argc > 2;
-    veryVerbose = argc > 3;
-    veryVeryVerbose = argc > 4;
+    int                 test = argc > 1 ? atoi(argv[1]) : 0;
+    bool             verbose = argc > 2;
+    bool         veryVerbose = argc > 3;
+    bool     veryVeryVerbose = argc > 4;
+    bool veryVeryVeryVerbose = argc > 5;
+
+    (void)veryVerbose;          // suppress warning
+    (void)veryVeryVerbose;      // suppress warning
+    (void)veryVeryVeryVerbose;  // suppress warning
 
     setbuf(stdout, NULL);    // Use unbuffered output
 

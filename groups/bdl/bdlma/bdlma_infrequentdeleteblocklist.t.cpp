@@ -1,7 +1,7 @@
 // bdlma_infrequentdeleteblocklist.t.cpp                              -*-C++-*-
 #include <bdlma_infrequentdeleteblocklist.h>
 
-#include <bdls_testutil.h>
+#include <bslim_testutil.h>
 
 #include <bslma_defaultallocatorguard.h>
 #include <bslma_testallocator.h>
@@ -67,22 +67,22 @@ void aSsErT(int c, const char *s, int i)
 //                       STANDARD BDE TEST DRIVER MACROS
 //-----------------------------------------------------------------------------
 
-#define ASSERT       BDLS_TESTUTIL_ASSERT
-#define LOOP_ASSERT  BDLS_TESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BDLS_TESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BDLS_TESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BDLS_TESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BDLS_TESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BDLS_TESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BDLS_TESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BDLS_TESTUTIL_LOOP6_ASSERT
-#define ASSERTV      BDLS_TESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define Q   BDLS_TESTUTIL_Q   // Quote identifier literally.
-#define P   BDLS_TESTUTIL_P   // Print identifier and value.
-#define P_  BDLS_TESTUTIL_P_  // P(X) without '\n'.
-#define T_  BDLS_TESTUTIL_T_  // Print a tab (w/o newline).
-#define L_  BDLS_TESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -196,12 +196,12 @@ int roundUp(int x, int y)
     // my_strpool.cpp
 
     enum {
-        INITIAL_SIZE  = 128,  // initial block size
+        k_INITIAL_SIZE  = 128,  // initial block size
 
-        GROWTH_FACTOR =   2,  // multiplicative factor by which to grow block
+        k_GROWTH_FACTOR =   2,  // multiplicative factor by which to grow block
 
-        THRESHOLD     = 128   // size beyond which an individual block may be
-                              // allocated if it doesn't fit in current block
+        k_THRESHOLD     = 128   // size beyond which an individual block may be
+                                // allocated if it doesn't fit in current block
     };
 
     // PRIVATE MANIPULATORS
@@ -209,13 +209,17 @@ int roundUp(int x, int y)
     {
         ASSERT(0 < numBytes);
 
-        if (THRESHOLD < numBytes) { // Alloc separate block if above threshold.
+        if (k_THRESHOLD < numBytes) {
+            // Alloc separate block if above threshold.
+
             return reinterpret_cast<char *>(
                                     d_blockList.allocate(numBytes));  // RETURN
         }
 
-        if (d_block_p) {  // Don't increase block size if no current block.
-            d_blockSize *= GROWTH_FACTOR;
+        if (d_block_p) {
+            // Do not increase block size if no current block.
+
+            d_blockSize *= k_GROWTH_FACTOR;
         }
         d_block_p = reinterpret_cast<char*>(d_blockList.allocate(d_blockSize));
         d_cursor  = numBytes;
@@ -226,7 +230,7 @@ int roundUp(int x, int y)
     // CREATORS
     my_StrPool::my_StrPool(bslma::Allocator *basicAllocator)
     : d_block_p(0)
-    , d_blockSize(INITIAL_SIZE)
+    , d_blockSize(k_INITIAL_SIZE)
     , d_cursor(0)
     , d_blockList(basicAllocator)  // the blocklist knows about 'bslma_default'
     {
@@ -234,7 +238,7 @@ int roundUp(int x, int y)
 
     my_StrPool::~my_StrPool()
     {
-        ASSERT(INITIAL_SIZE <= d_blockSize);
+        ASSERT(k_INITIAL_SIZE <= d_blockSize);
         ASSERT(d_block_p || (0 <= d_cursor && d_cursor <= d_blockSize));
     }
 
@@ -251,17 +255,17 @@ int roundUp(int x, int y)
             return p;                                                 // RETURN
         }
         else {
-            return allocateBlock(size);
+            return allocateBlock(size);                               // RETURN
         }
     }
 //..
 // In the code shown above, the 'my_StrPool' memory manager allocates from its
 // 'bdlma::InfrequentDeleteBlockList' member object an initial memory block of
-// size 'INITIAL_SIZE'.  This size is multiplied by 'GROWTH_FACTOR' each time a
-// depleted memory block is replaced by a newly-allocated block.  The
+// size 'k_INITIAL_SIZE'.  This size is multiplied by 'k_GROWTH_FACTOR' each
+// time a depleted memory block is replaced by a newly-allocated block.  The
 // 'allocate' method distributes memory from the current memory block
 // piecemeal, except when the requested size (1) is not available in the
-// current block, or (2) exceeds the 'THRESHOLD', in which case a separate
+// current block, or (2) exceeds the 'k_THRESHOLD', in which case a separate
 // memory block is allocated and returned.  When the 'my_StrPool' memory
 // manager is destroyed, its 'bdlma::InfrequentDeleteBlockList' member object
 // is also destroyed, which in turn automatically deallocates all of its
@@ -746,7 +750,7 @@ int main(int argc, char *argv[])
 
             const void *EXP_P = (char *)oa.lastAllocatedAddress() + HDRSZ;
 
-            int numBytes = oa.lastAllocatedNumBytes();
+            int numBytes = static_cast<int>(oa.lastAllocatedNumBytes());
 
             int offset = U::calculateAlignmentOffset(p, U::BSLS_MAX_ALIGNMENT);
 
@@ -859,7 +863,7 @@ int main(int argc, char *argv[])
 }
 
 // ----------------------------------------------------------------------------
-// Copyright 2012 Bloomberg Finance L.P.
+// Copyright 2015 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

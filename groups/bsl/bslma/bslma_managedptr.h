@@ -120,7 +120,7 @@ BSLS_IDENT("$Id$ $CSID$")
 ///-----
 // In this section we show intended usage of this component.
 //
-///Example 1: Implementing a protocol
+///Example 1: Implementing a Protocol
 /// - - - - - - - - - - - - - - - - -
 // We demonstrate using 'ManagedPtr' to configure and return a managed object
 // implementing an abstract protocol.
@@ -1169,7 +1169,7 @@ class ManagedPtr {
         // but does *not* allow managed pointers to be compared (e.g., via '<'
         // or '>').  Note that a superior solution is available in C++11 using
         // the 'explicit operator bool()' syntax, that removes the need for a
-        // special boolean-like type and private equality comparison operators.
+        // special boolean-like type and private equality-comparison operators.
 
     typename bslmf::AddReference<TARGET_TYPE>::Type operator*() const;
         // Return a reference to the target object.  The behavior is undefined
@@ -1742,7 +1742,7 @@ struct HasPointerSemantics<bslma::ManagedPtr<TARGET_TYPE> >
 template <class TARGET_TYPE>
 struct IsBitwiseMoveable<bslma::ManagedPtr<TARGET_TYPE> > : bsl::true_type {};
 
-}  // close traits namespace
+}  // close namespace bslmf
 }  // close enterprise namespace
 
 #endif

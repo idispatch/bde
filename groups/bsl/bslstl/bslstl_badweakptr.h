@@ -11,7 +11,7 @@ BSLS_IDENT("$Id: $")
 //
 //@CLASSES:
 //  bslstl::BadWeakPtr: exception class derived from 'native_std' classes
-//  bsl::bad_weak_ptr: alias to an exception type thrown by the bsl library
+//  bsl::bad_weak_ptr: alias to an exception type thrown by the 'bsl' library
 //
 //@SEE_ALSO: bslstl_sharedptr, bslstl_stdexceptionutil
 //
@@ -21,8 +21,8 @@ BSLS_IDENT("$Id: $")
 ///-----
 // This section illustrates intended use of this component.
 //
-///Example 1: ...
-///- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///Example 1: TBD
+/// - - - - - - -
 
 // Prevent 'bslstl' headers from being included directly in 'BSL_OVERRIDES_STD'
 // mode.  Doing so is unsupported, and is likely to cause compilation errors.
@@ -60,7 +60,7 @@ typedef native_std::bad_weak_ptr bad_weak_ptr;
 typedef ::BloombergLP::bslstl::BadWeakPtr bad_weak_ptr;
 #endif
 
-}  // close 'bsl' namespace
+}  // close namespace bsl
 
 
 namespace BloombergLP {
@@ -85,7 +85,7 @@ class BadWeakPtr : public native_std::exception {
         // 'bsls_exceptionutil' macro 'BSLS_NOTHROW_SPEC' is deliberately not
         // used here, as a number of standard libraries declare 'what' in the
         // base 'exception' class explicitly with the no-throw specification,
-        // even in a build that may not recongnise exceptions.
+        // even in a build that may not recognize exceptions.
 };
 
 // ============================================================================

@@ -154,9 +154,7 @@ class AllocTestType {
                                   // Aspects
 
     bslma::Allocator *allocator() const;
-        // Return the allocator used by this object to supply memory.  Note
-        // that if no allocator was supplied at construction the currently
-        // installed default allocator is used.
+        // Return the allocator used by this object to supply memory.
 };
 
 // FREE OPERATORS
@@ -170,9 +168,9 @@ bool operator!=(const AllocTestType& lhs, const AllocTestType& rhs);
     // same value, and 'false' otherwise.  Two 'AllocTestType' objects do not
     // have the same value if their 'data' attributes are not the same.
 
-// ===========================================================================
+// ============================================================================
 //                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS
-// ===========================================================================
+// ============================================================================
 
                         // -------------------
                         // class AllocTestType

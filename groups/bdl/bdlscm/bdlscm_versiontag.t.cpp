@@ -2,49 +2,57 @@
 
 #include <bdlscm_versiontag.h>
 
-#include <bsl_cstdlib.h>     // atoi()
-#include <bsl_cstring.h>
-#include <bsl_cstdio.h>
+#include <bslim_testutil.h>
 
+#include <bsl_cstdlib.h>     // 'atoi'
+#include <bsl_iostream.h>
 
 using namespace BloombergLP;
+using namespace bsl;
 
-//==========================================================================
-//                  STANDARD BDE ASSERT TEST MACRO
-//--------------------------------------------------------------------------
-// NOTE: THIS IS A LOW-LEVEL COMPONENT AND MAY NOT USE ANY C++ LIBRARY
-// FUNCTIONS, INCLUDING IOSTREAMS.
+// ============================================================================
+//                      STANDARD BDE ASSERT TEST MACRO
+// ----------------------------------------------------------------------------
+
 static int testStatus = 0;
-static bool verbose = false;
-static bool veryVerbose = false;
 
-static void aSsErT(int c, const char *s, int i) {
-    if (c) {
-        bsl::fprintf(stderr, "Error " __FILE__ "(%d): %s    (failed)\n", i, s);
-        if (testStatus >= 0 && testStatus <= 100) ++testStatus;
+static void aSsErT(bool condition, const char *message, int line)
+{
+    if (condition) {
+        cout << "Error " __FILE__ "(" << line << "): " << message
+             << "    (failed)" << endl;
+
+        if (0 <= testStatus && testStatus <= 100) {
+            ++testStatus;
+        }
     }
 }
 
-#define ASSERT(X) { aSsErT(!(X), #X, __LINE__); }
+// ============================================================================
+//                      STANDARD BDE TEST DRIVER MACROS
+// ----------------------------------------------------------------------------
 
-#define LOOP_ASSERT(I,X) { \
-    if (!(X)) { bsl::printf("%s: %d\n", #I, I); \
-                aSsErT(1, #X, __LINE__); } }
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-//--------------------------------------------------------------------------
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
 
-//=============================================================================
-//                  SEMI-STANDARD TEST OUTPUT MACROS
-//-----------------------------------------------------------------------------
-// #define P(X) cout << #X " = " << (X) << endl; // Print identifier and value.
-#define Q(X) bsl::printf("<| " #X " |>\n");  // Quote identifier literally.
-//#define P_(X) cout << #X " = " << (X) << ", " << flush; // P(X) without '\n'
-#define L_ __LINE__                           // current Line number
-#define T_ bsl::printf("\t");             // Print a tab (w/o newline)
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
-//=============================================================================
-//                  USAGE EXAMPLE HELPER FUNCTIONS
-//-----------------------------------------------------------------------------
+// ============================================================================
+//                      USAGE EXAMPLE HELPER FUNCTIONS
+// ----------------------------------------------------------------------------
 
 int newFunction()
     // Return 1
@@ -55,17 +63,16 @@ int newFunction()
 // int OldFunction()
 // Not defined and never called due to conditional compilation
 
-//=============================================================================
-//                  MAIN PROGRAM
-//-----------------------------------------------------------------------------
+// ============================================================================
+//                               MAIN PROGRAM
+// ----------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
     int test = argc > 1 ? bsl::atoi(argv[1]) : 0;
+    bool verbose = argc > 2;
+    bool veryVerbose = argc > 3;
 
-    verbose = (argc > 2);
-    veryVerbose = (argc > 3);
-
-    bsl::printf("TEST %s CASE %d\n", __FILE__, test);
+    cout << "TEST " << __FILE__ << " CASE " << test << endl;
 
     switch (test) { case 0:
       case 3: {
@@ -84,29 +91,31 @@ int main(int argc, char *argv[])
         //   USAGE EXAMPLE
         //--------------------------------------------------------------------
 
-        if (verbose) bsl::printf("\nTEST USAGE EXAMPLE"
-                                 "\n==================\n");
+        if (verbose) cout << endl
+                          << "TEST USAGE EXAMPLE" << endl
+                          << "==================" << endl;
 
+///Usage
+///-----
 // At compile time, the version of BDL can be used to select an older or newer
 // way to accomplish a task, to enable new functionality, or to accommodate an
-// interface change.  For example, if a function changed names (a rare
-// occurrence, but disruptive when it does happen), disruption can be minimized
-// by conditionally calling the old or new function name using conditional
-// compilation.  The '#if' directive compares 'BDL_VERSION' to a specified
-// major, minor, and patch version 4 composed using 'BDL_MAKE_VERSION':
+// interface change.  For example, if the name of a function changes (a rare
+// occurrence, but potentially disruptive when it does happen), the impact on
+// affected code can be minimized by conditionally calling the function by its
+// old or new name using conditional compilation.  In the following, the '#if'
+// preprocessor directive compares 'BDL_VERSION' (i.e., the latest BDL version,
+// excluding the patch version) to a specified major and minor version composed
+// using the 'BSL_MAKE_VERSION' macro:
 //..
-    #if BDL_VERSION > BSL_MAKE_VERSION(1, 2)
-        // Call 'newFunction' for BDL version 1.2 and later:
+    #if BDL_VERSION > BSL_MAKE_VERSION(1, 3)
+        // Call 'newFunction' for BDL versions later than 1.3.
         int result = newFunction();
     #else
-        // Call 'oldFunction' for BDL older than version 1.2:
+        // Call 'oldFunction' for BDL version 1.3 or earlier.
         int result = oldFunction();
     #endif
-
-        ASSERT(result);
 //..
       } break;
-
       case 2: {
         //--------------------------------------------------------------------
         // TEST BDL_MAKE_VERSION MACRO
@@ -129,8 +138,9 @@ int main(int argc, char *argv[])
         //   BDL_MAKE_VERSION(major, minor)
         //--------------------------------------------------------------------
 
-        if (verbose) bsl::printf("\nTEST BDL_MAKE_VERSION MACRO"
-                                 "\n===========================\n");
+        if (verbose) cout << endl
+                          << "TEST BDL_MAKE_VERSION MACRO" << endl
+                          << "===========================" << endl;
 
         static const char COMPILE_ASSERT[BSL_MAKE_VERSION(0,1)] = { 0 };
         ASSERT(sizeof(COMPILE_ASSERT) == 100);
@@ -184,8 +194,9 @@ int main(int argc, char *argv[])
         //   BDL_VERSION_MINOR
         //--------------------------------------------------------------------
 
-        if (verbose) bsl::printf("\nTEST VERSION CONSISTENCY"
-                                 "\n========================\n");
+        if (verbose) cout << endl
+                          << "TEST VERSION CONSISTENCY" << endl
+                          << "========================" << endl;
 
         int major = (BDL_VERSION / 10000) % 100;
         int minor = (BDL_VERSION / 100) % 100;
@@ -196,14 +207,13 @@ int main(int argc, char *argv[])
       } break;
 
       default: {
-        bsl::fprintf(stderr, "WARNING: CASE `%d' NOT FOUND.\n", test);
+        cerr << "WARNING: CASE `" << test << "' NOT FOUND." << endl;
         testStatus = -1;
       }
     }
 
     if (testStatus > 0) {
-        bsl::fprintf(stderr, "Error, non-zero test status = %d.\n",
-                     testStatus);
+        cerr << "Error, non-zero test status = " << testStatus << "." << endl;
     }
     return testStatus;
 }

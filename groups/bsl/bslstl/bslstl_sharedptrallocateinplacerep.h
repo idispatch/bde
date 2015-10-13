@@ -24,7 +24,7 @@ BSLS_IDENT("$Id$ $CSID$")
 // object are released (using 'releaseRef'), the destructor of 'TYPE' is
 // invoked.
 //
-///Thread-Safety
+///Thread Safety
 ///-------------
 // 'bslstl::SharedPtrAllocateInplaceRep' is thread-safe provided that
 // 'disposeObject' and 'disposeRep' are not called explicitly, meaning that all
@@ -256,7 +256,7 @@ struct UsesBslmaAllocator< bslstl::SharedPtrAllocateInplaceRep<TYPE,
     : bsl::false_type
 {};
 
-}  // close traits namespace
+}  // close namespace bslma
 }  // close enterprise namespace
 
 #endif

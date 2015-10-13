@@ -81,7 +81,7 @@ using namespace bsl;
 //     ImpUtil      bslstl::VectorImpUtil
 //-----------------------------------------------------------------------------
 // class Vector_Imp<T,A> (vector)
-// =================================
+// ============================================================================
 // [11] TRAITS
 //
 // CREATORS:
@@ -1331,9 +1331,9 @@ struct IsBitwiseMoveable<LimitAllocator<ALLOCATOR> >
     : IsBitwiseMoveable<ALLOCATOR>
 {};
 
-}
+}  // close namespace bslmf
 
-}  // namespace BloombergLP
+}  // close enterprise namespace
 
 //=============================================================================
 //                            Test Case 22
@@ -9125,7 +9125,7 @@ namespace {
 //
 ///Example 1: Creating a Matrix Type
 ///- - - - - - - - - - - - - - - - -
-// Suppose we want to define a value semantic type representing a dynamically
+// Suppose we want to define a value-semantic type representing a dynamically
 // resizable two-dimensional matrix.
 //
 // First, we define the public interface for the 'MyMatrix' class template:

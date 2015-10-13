@@ -215,6 +215,10 @@ BSLS_IDENT("$Id: $")
 #include <bslmf_istriviallycopyable.h>
 #endif
 
+#ifndef INCLUDED_BSLH_HASH
+#include <bslh_hash.h>
+#endif
+
 #ifndef INCLUDED_BSLS_ASSERT
 #include <bsls_assert.h>
 #endif
@@ -240,6 +244,7 @@ class Date {
     // representation).  See {Valid Date Values and Their Representations} for
     // details.
 
+
     // DATA
     int d_serialDate;  // absolute serial date (1 == 1/1/1, 2 == 1/1/2, ...)
 
@@ -254,6 +259,8 @@ class Date {
     friend Date operator+(int, const Date&);
     friend Date operator-(const Date&, int);
     friend int  operator-(const Date&, const Date&);
+    template <class HASHALG>
+    friend void hashAppend(HASHALG& hashAlg, const Date&);
 
   private:
     // PRIVATE CLASS METHODS
@@ -535,6 +542,13 @@ Date operator-(const Date& date, int numDays);
 int operator-(const Date& lhs, const Date& rhs);
     // Return the (signed) number of days between the specified 'lhs' and 'rhs'
     // dates.  Note that if 'lhs < rhs' the result will be negative.
+
+template <class HASHALG>
+void hashAppend(HASHALG& hashAlg, const Date& date);
+    // Pass the specified 'date' to the specified 'hashAlg'.  Note that this
+    // function is intended to integrate with the 'bslh' modular hashing
+    // system, and effectively provides a 'bsl::hash' specialization for
+    // 'date'.
 
 // ============================================================================
 //                              INLINE DEFINITIONS
@@ -930,6 +944,14 @@ int bdlt::operator-(const Date& lhs, const Date& rhs)
 {
 
     return lhs.d_serialDate - rhs.d_serialDate;
+}
+
+// ASPECTS
+template <class HASHALG>
+void bdlt::hashAppend(HASHALG& hashAlg, const Date& date)
+{
+    using ::BloombergLP::bslh::hashAppend;
+    hashAppend(hashAlg, date.d_serialDate);
 }
 
 }  // close enterprise namespace

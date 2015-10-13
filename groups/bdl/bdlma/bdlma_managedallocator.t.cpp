@@ -1,7 +1,7 @@
 // bdlma_managedallocator.t.cpp                                       -*-C++-*-
 #include <bdlma_managedallocator.h>
 
-#include <bdls_testutil.h>
+#include <bslim_testutil.h>
 
 #include <bslma_default.h>
 #include <bslma_defaultallocatorguard.h>
@@ -66,22 +66,22 @@ void aSsErT(int c, const char *s, int i)
 //                       STANDARD BDE TEST DRIVER MACROS
 //-----------------------------------------------------------------------------
 
-#define ASSERT       BDLS_TESTUTIL_ASSERT
-#define LOOP_ASSERT  BDLS_TESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BDLS_TESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BDLS_TESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BDLS_TESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BDLS_TESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BDLS_TESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BDLS_TESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BDLS_TESTUTIL_LOOP6_ASSERT
-#define ASSERTV      BDLS_TESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define Q   BDLS_TESTUTIL_Q   // Quote identifier literally.
-#define P   BDLS_TESTUTIL_P   // Print identifier and value.
-#define P_  BDLS_TESTUTIL_P_  // P(X) without '\n'.
-#define T_  BDLS_TESTUTIL_T_  // Print a tab (w/o newline).
-#define L_  BDLS_TESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -116,6 +116,8 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
 //=============================================================================
 //                                USAGE EXAMPLE
 //-----------------------------------------------------------------------------
+
+class my_SecurityAttributes;
 
 ///Usage
 ///-----
@@ -183,11 +185,10 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
             // construction.
     };
 //..
-// Next, we define the 'inline' methods of 'my_BufferAllocator'.  Note that
-// the 'release' method resets the internal cursor to 0, effectively making
-// the memory from the entire external buffer supplied at construction
-// available for subsequent allocations, but has no effect on the contents of
-// the buffer:
+// Next, we define the 'inline' methods of 'my_BufferAllocator'.  Note that the
+// 'release' method resets the internal cursor to 0, effectively making the
+// memory from the entire external buffer supplied at construction available
+// for subsequent allocations, but has no effect on the contents of the buffer:
 //..
     // CREATORS
     inline
@@ -215,8 +216,7 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
 // 'allocateFromBufferImp', provides the bulk of the implementation of the
 // 'allocate' method:
 //..
-//  // my_bufferallocator.cpp
-//  #include <my_bufferallocator.h>
+    // my_bufferallocator.cpp
 
     // STATIC HELPER FUNCTIONS
     static
@@ -240,7 +240,7 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
                                       bsls::AlignmentUtil::BSLS_MAX_ALIGNMENT);
 
         if (*cursor + offset + size > bufferSize) {  // insufficient space
-            return 0;
+            return 0;                                                 // RETURN
         }
 
         void *result = &buffer[*cursor + offset];
@@ -272,14 +272,14 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
 // only add unnecessary complications to the usage example.  The portions shown
 // are sufficient to illustrate the use of 'bdlma::ManagedAllocator'.
 //
-// The domain of our example is financial markets.  Suppose that we are given
-// a list of market indices (e.g., Dow Jones Industrial Average, S&P 500,
-// etc.), and we want to perform some computation on each index, in turn.  In
-// this example, the essential attributes of an index are held in a 'bsl::pair'
+// The domain of our example is financial markets.  Suppose that we are given a
+// list of market indices (e.g., Dow Jones Industrial Average, S&P 500, etc.),
+// and we want to perform some computation on each index, in turn.  In this
+// example, the essential attributes of an index are held in a 'bsl::pair'
 // consisting of the name of the index (e.g., "DJIA") and the number of
 // securities that comprise the index (e.g., 30 in the case of the DJIA).  The
-// collection of market indices that we wish to process is given by a vector
-// of such pairs.  Thus, we make use of these types related to indices:
+// collection of market indices that we wish to process is given by a vector of
+// such pairs.  Thus, we make use of these types related to indices:
 //..
     typedef bsl::pair<const char *, int> IndexAttributes;
     typedef bsl::vector<IndexAttributes> IndexCollection;
@@ -302,7 +302,6 @@ struct ProtocolClassTestImp : bsls::ProtocolTestImp<ProtocolClass> {
 // For the collection of securities comprising an index we use a vector of
 // 'my_SecurityAttributes':
 //..
-class my_SecurityAttributes;
     typedef bsl::vector<my_SecurityAttributes> SecurityCollection;
 //..
 // Since some indices are quite large (e.g., Russell 3000, Wilshire 5000), for
@@ -678,7 +677,7 @@ int main(int argc, char *argv[])
 }
 
 // ----------------------------------------------------------------------------
-// Copyright 2012 Bloomberg Finance L.P.
+// Copyright 2015 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

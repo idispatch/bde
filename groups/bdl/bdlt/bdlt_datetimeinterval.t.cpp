@@ -1,7 +1,7 @@
 // bdlt_datetimeinterval.t.cpp                                        -*-C++-*-
 #include <bdlt_datetimeinterval.h>
 
-#include <bdls_testutil.h>
+#include <bslim_testutil.h>
 
 #include <bslma_default.h>
 #include <bslma_defaultallocatorguard.h>
@@ -28,6 +28,8 @@
 #include <bsl_cstring.h>     // 'memcmp'
 #include <bsl_iostream.h>
 #include <bsl_sstream.h>
+
+#include <cmath>
 
 using namespace BloombergLP;
 using namespace bsl;
@@ -71,6 +73,10 @@ using namespace bsl;
 //: o No memory is ever allocated from the default allocator.
 //: o Precondition violations are detected in appropriate build modes.
 // ----------------------------------------------------------------------------
+// PUBLIC CLASS DATA
+// [  ] static const bsls::Types::Int64 k_MILLISECONDS_MAX = ...;
+// [  ] static const bsls::Types::Int64 k_MILLISECONDS_MIN = ...;
+//
 // CLASS METHODS
 // [10] static int maxSupportedBdexVersion(int versionSelector);
 //
@@ -163,23 +169,23 @@ void aSsErT(bool condition, const char *message, int line)
 //               STANDARD BDE TEST DRIVER MACRO ABBREVIATIONS
 // ----------------------------------------------------------------------------
 
-#define ASSERT       BDLS_TESTUTIL_ASSERT
-#define ASSERTV      BDLS_TESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define LOOP_ASSERT  BDLS_TESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BDLS_TESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BDLS_TESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BDLS_TESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BDLS_TESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BDLS_TESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BDLS_TESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BDLS_TESTUTIL_LOOP6_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
 
-#define Q            BDLS_TESTUTIL_Q   // Quote identifier literally.
-#define P            BDLS_TESTUTIL_P   // Print identifier and value.
-#define P_           BDLS_TESTUTIL_P_  // P(X) without '\n'.
-#define T_           BDLS_TESTUTIL_T_  // Print a tab (w/o newline).
-#define L_           BDLS_TESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -224,12 +230,10 @@ const Int64 k_SECS_MIN  =   60 *                    k_MINS_MIN  -  59;
 const Int64 k_MSECS_MAX = 1000 *                    k_SECS_MAX  + 999;
 const Int64 k_MSECS_MIN = 1000 *                    k_SECS_MIN  - 999;
 
-// The following compile-time assertions must be kept in sync with the
-// corresponding enumerators declared 'private' to 'DatetimeInterval' in this
-// component's header file.
+// Verify PUBLIC CLASS DATA
 
-BSLMF_ASSERT(k_MSECS_MAX ==  185542587187199999LL);
-BSLMF_ASSERT(k_MSECS_MIN == -185542587187199999LL - k_MSECS_PER_DAY);
+BSLMF_ASSERT(k_MSECS_MAX == Obj::k_MILLISECONDS_MAX);
+BSLMF_ASSERT(k_MSECS_MIN == Obj::k_MILLISECONDS_MIN);
 
 // ============================================================================
 //                                 TYPE TRAITS
@@ -533,7 +537,8 @@ int main(int argc, char *argv[])
 
     // CONCERN: In no case does memory come from the default allocator.
 
-    bslma::TestAllocator defaultAllocator("default", veryVeryVeryVerbose);
+    bslma::TestAllocator         defaultAllocator("default",
+                                                  veryVeryVeryVerbose);
     bslma::DefaultAllocatorGuard defaultAllocatorGuard(&defaultAllocator);
 
     switch (test) { case 0:
@@ -1682,7 +1687,7 @@ if (veryVerbose)
         if (verbose) cout << "\nUse a table of distinct object values."
                           << endl;
 
-        const int NUM_DATA                 = ALT_NUM_DATA;
+        const int          NUM_DATA        = ALT_NUM_DATA;
         const AltDataRow (&DATA)[NUM_DATA] = ALT_DATA;
 
         for (int ti = 0; ti < NUM_DATA; ++ti) {
@@ -2622,7 +2627,7 @@ if (veryVerbose)
         if (verbose) cout << "\nUse a table of distinct object values."
                           << endl;
 
-        const int NUM_DATA                     = DEFAULT_NUM_DATA;
+        const int              NUM_DATA        = DEFAULT_NUM_DATA;
         const DefaultDataRow (&DATA)[NUM_DATA] = DEFAULT_DATA;
 
         for (int ti = 0; ti < NUM_DATA; ++ti) {
@@ -2658,12 +2663,12 @@ if (veryVerbose)
  && (defined(BSLS_PLATFORM_CMP_GNU) || defined(BSLS_PLATFORM_CMP_CLANG))
     // This is necessary because on Linux, for some inexplicable reason, even
     // 'X.totalSecondsAsDouble() == X.totalSecondsAsDouble()' returns 'false'.
-    // Under gcc 4.3.5, it is even necessary to declare 'SECONDS' as
-    // 'volatile', probably in order to force a narrowing of the value to a
+    // This is probably needed in order to force a narrowing of the value to a
     // 64-bit 'double' from the wider internal processor FP registers.
 
             volatile double DBL_SECS2 = X.totalSecondsAsDouble();
-            LOOP_ASSERT(LINE, DBL_SECS == DBL_SECS2);
+            LOOP_ASSERT(LINE, (0.0 == DBL_SECS && 0.0 == DBL_SECS2)
+                                || fabs(DBL_SECS / DBL_SECS2 - 1.0) < 1.0e-15);
 
     // The last 'LOOP_ASSERT' is commented out due to a precision problem when
     // casting from 'double' to 'Int64'.  For example:
@@ -3132,7 +3137,7 @@ if (veryVerbose)
         if (verbose) cout << "\nUse a table of distinct object values."
                           << endl;
 
-        const int NUM_DATA                 = ALT_NUM_DATA;
+        const int          NUM_DATA        = ALT_NUM_DATA;
         const AltDataRow (&DATA)[NUM_DATA] = ALT_DATA;
 
         for (int ti = 0; ti < NUM_DATA; ++ti) {
@@ -3420,7 +3425,7 @@ if (veryVerbose)
         if (verbose) cout << "\nUse a table of distinct object values."
                           << endl;
 
-        const int NUM_DATA                 = ALT_NUM_DATA;
+        const int          NUM_DATA        = ALT_NUM_DATA;
         const AltDataRow (&DATA)[NUM_DATA] = ALT_DATA;
 
         for (int ti = 0; ti < NUM_DATA; ++ti) {
@@ -4926,7 +4931,8 @@ if (veryVerbose)
                 }
 
                 {
-                    bslma::TestAllocator da("default", veryVeryVeryVerbose);
+                    bslma::TestAllocator         da("default",
+                                                    veryVeryVeryVerbose);
                     bslma::DefaultAllocatorGuard dag(&da);
 
                     // Verify output is formatted as expected.
@@ -5019,7 +5025,8 @@ if (veryVerbose)
                 LOOP_ASSERT(LINE, &os2 == &(os2 << X));
 
                 {
-                    bslma::TestAllocator da("default", veryVeryVeryVerbose);
+                    bslma::TestAllocator         da("default",
+                                                    veryVeryVeryVerbose);
                     bslma::DefaultAllocatorGuard dag(&da);
 
                     // Verify output is formatted as expected.
@@ -5083,7 +5090,7 @@ if (veryVerbose)
         if (verbose) cout << "\nUse a table of distinct object values."
                           << endl;
 
-        const int NUM_DATA                     = DEFAULT_NUM_DATA;
+        const int              NUM_DATA        = DEFAULT_NUM_DATA;
         const DefaultDataRow (&DATA)[NUM_DATA] = DEFAULT_DATA;
 
         if (verbose) cout <<

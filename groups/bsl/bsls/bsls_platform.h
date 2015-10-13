@@ -16,6 +16,7 @@ BSLS_IDENT("$Id: $")
 //  BSLS_PLATFORM_OS_*: operating system type, sub-type, and version
 //  BSLS_PLATFORM_CPU_* instruction set, instruction width, and version
 //  BSLS_PLATFORM_CMP_*: compiler vendor, and version
+//  BSLS_PLATFORM_AGGRESSIVE_INLINE: inline code for speed over text size
 //
 //@DESCRIPTION: This component implements a suite of preprocessor macros
 // and traits that identify and define platform-specific compile-time
@@ -32,7 +33,7 @@ BSLS_IDENT("$Id: $")
 //  =============================================================
 //                           OPERATING SYSTEM
 //  -------------------------------------------------------------
-//       Type                Subtype               Version
+//              Type                Subtype               Version
 //  -----------------   -------------------   -------------------
 //   @_OS_UNIX           @_OS_AIX              @_OS_VER_MAJOR
 //                       @_OS_HPUX             @_OS_VER_MINOR
@@ -51,7 +52,7 @@ BSLS_IDENT("$Id: $")
 //  ============================================================
 //                              PROCESSOR
 //  ------------------------------------------------------------
-//  Instruction Set          Width                 Version
+//          Instruction Set          Width                 Version
 //  ---------------    -------------------   -------------------
 //   @_CPU_88000        @_CPU_32_BIT          @_CPU_VER_MAJOR
 //   @_CPU_ALPHA        @_CPU_64_BIT          @_CPU_VER_MINOR
@@ -66,7 +67,7 @@ BSLS_IDENT("$Id: $")
 //  =============================================================
 //                              COMPILER
 //  -------------------------------------------------------------
-//     Vendor                Version
+//                      Vendor                Version
 //  -----------------   -------------------
 //   @_CMP_CLANG         @_CMP_VER_MAJOR
 //   @_CMP_EDG           @_CMP_VER_MINOR
@@ -75,6 +76,15 @@ BSLS_IDENT("$Id: $")
 //   @_CMP_IBM
 //   @_CMP_MSVC
 //   @_CMP_SUN
+//
+//  =============================================================
+//
+//  =============================================================
+//                              INLINING
+//  -------------------------------------------------------------
+//                                  Flag
+//  -----------------
+//   @_AGGRESSIVE_INLINE
 //
 //  =============================================================
 //..
@@ -87,6 +97,14 @@ BSLS_IDENT("$Id: $")
 // discrimination is required (e.g., based on sub-type or version of a specific
 // operating system, processor, or compiler).  Note that supplying a minor
 // version number implies that the major version is also defined.
+//
+// The aggressive inlining macro 'BSLS_PLATFORM_AGGRESSIVE_INLINE' is defined
+// as the 'inline' keyword on all compilers except 'BSLS_PLATFROM_CMP_IBM' and
+// 'BSLS_PLATFORM_CMP_SUN', where it is left empty.  This is required for some
+// of our legacy applications where substantially growing the text size is not
+// possible.  Even on those platforms, the symbol will be defined as 'inline'
+// if 'BDE_BUILD_TARGET_AGGRESSIVE_INLINE' is passed in via the '-D' option of
+// the compiler.
 //
 ///Usage
 ///-----
@@ -185,7 +203,7 @@ struct bsls_Platform_Assert;
 // preserve the alphabetical order of the table, inserting the necessary
 // configuration logic in the preprocessor statements below.
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 #if defined(__xlC__) || defined(__IBMC__) || defined(__IBMCPP__)
     #define BSLS_PLATFORM_CMP_IBM 1
     #define BSLS_PLATFORM_CMP_VERSION __xlC__
@@ -646,7 +664,7 @@ struct bsls_Platform_Assert;
     #if !defined(BSLS_PLATFORM_CPU_64_BIT)
         #define BSLS_PLATFORM_CPU_32_BIT 1
     #endif
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 #elif defined(__SUNPRO_CC) || defined(__SUNPRO_C)
 
     #define BSLS_PLATFORM_CMP_SUN 1
@@ -724,7 +742,7 @@ struct bsls_Platform_Assert;
     #error "Could not identify the compiler."
     BSLS_PLATFORM_COMPILER_ERROR;
 #endif
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // Determine endianness.
 
@@ -832,6 +850,19 @@ struct bsls_Platform_Assert;
 #if defined(BSLS_PLATFORM_CMP_IBM) && !defined(BSLS_PLATFORM_CPU_64_BIT)
     #define BSLS_PLATFORM_NO_64_BIT_LITERALS 1
 #endif
+
+#if (defined(BSLS_PLATFORM_CMP_GNU) && BSLS_PLATFORM_CMP_VER_MAJOR >= 40600)  \
+                                    || defined(BSLS_PLATFORM_CMP_CLANG)
+     #define BSLS_PLATFORM_HAS_PRAGMA_GCC_DIAGNOSTIC 1
+#endif
+
+#if !(defined(BSLS_PLATFORM_CMP_AIX) || defined(BSLS_PLATFORM_CMP_SUN)) \
+                                && !defined(BDE_BUILD_TARGET_AGGRESSIVE_INLINE)
+    #define BSLS_PLATFORM_AGGRESSIVE_INLINE inline
+#else
+    #define BSLS_PLATFORM_AGGRESSIVE_INLINE
+#endif
+
 // ----------------------------------------------------------------------------
 
                                  // Validation

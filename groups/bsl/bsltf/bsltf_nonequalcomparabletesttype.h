@@ -16,7 +16,7 @@ BSLS_IDENT("$Id: $")
 //
 //@DESCRIPTION: This component provides a single, unconstrained
 // (value-semantic) attribute class, 'NonEqualComparableTestType', that does
-// not provide equality comparison operators.  This is particularly valuable
+// not provide equality-comparison operators.  This is particularly valuable
 // when test containers that should work with non-equal-comparable types.
 //
 ///Attributes
@@ -32,8 +32,8 @@ BSLS_IDENT("$Id: $")
 ///-----
 // This section illustrates intended use of this component.
 //
-///Example 1: Demonstrating The Type Can't Be Equal Compared
-///- - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///Example 1: Demonstrating the Type Cannot be Equality Compared
+///- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Suppose we wanted to show 'NonEqualComparableTestType' can't be equal
 // compared.
 //
@@ -60,7 +60,7 @@ namespace bsltf {
 
 class NonEqualComparableTestType {
     // This unconstrained (value-semantic) attribute class does not
-    // provide a equality comparison operators.
+    // provide equality-comparison operators.
 
     // DATA
     int d_data;  // integer class value
@@ -101,9 +101,9 @@ class NonEqualComparableTestType {
         // Return the value of the 'data' attribute of this object.
 };
 
-// ===========================================================================
+// ============================================================================
 //                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS
-// ===========================================================================
+// ============================================================================
 
                         // --------------------------------
                         // class NonEqualComparableTestType

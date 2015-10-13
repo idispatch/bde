@@ -74,7 +74,7 @@ BSLS_IDENT("$Id: $")
 // the means of adjustment may change in the future.
 //
 ///Well-Formed 'HashTableAnchor' Objects
-///--------------------------------------
+///-------------------------------------
 // Many of the algorithms defined in this component operate on
 // 'HashTableAnchor' objects, which describe the attributes of a hash table.
 // The 'HashTableAnchor' objects supplied to 'HashTableImpUtil' are required
@@ -99,7 +99,7 @@ BSLS_IDENT("$Id: $")
 ///'KEY_CONFIG' Template Parameter
 ///-------------------------------
 // Several of the operations provided by 'HashTableImpUtil' are template
-// functions parametrized on the typename 'KEY_CONFIG'.
+// functions parameterized on the typename 'KEY_CONFIG'.
 //
 ///'KEY_CONFIG'
 /// - - - - - -
@@ -118,6 +118,7 @@ BSLS_IDENT("$Id: $")
 //      // Return the 'KeyType' information associated with the specified
 //      // 'object'.
 //..
+//
 ///Usage
 ///-----
 // This section illustrates intended usage of this component.
@@ -388,7 +389,7 @@ BSLS_IDENT("$Id: $")
 // Then, we customize our table to manipulate zero-terminated 'const char *'
 // strings.  We make the simplifying assumption that the strings pointed at by
 // the 'const char *'s are longer-lived that the 'HashSet' will be.  We must
-// provide an equality comparator so that two copies, in diffferent locations,
+// provide an equality comparator so that two copies, in different locations,
 // of the same sequence of characters will evaluate equal:
 //..
 //  struct StringEqual {
@@ -444,7 +445,7 @@ BSLS_IDENT("$Id: $")
 //  assert(1 == hs.insert("meow"));
 //..
 // Next, we attempt to insert a redundant value, and observe that the 'insert'
-// mthod returns 'false' to indicate that the insert was refused:
+// method returns 'false' to indicate that the insert was refused:
 //..
 //  assert(0 == hs.insert("woof"));
 //..
@@ -464,7 +465,7 @@ BSLS_IDENT("$Id: $")
 //..
 // Then, we attempt to erase a string which is not in our 'HashSet' and observe
 // that 'false' is returned, which tells us the 'erase' attempt was
-// unsuccesful:
+// unsuccessful:
 //..
 //  assert(0 == hs.erase("ruff"));
 //..
@@ -554,7 +555,6 @@ BSLS_IDENT("$Id: $")
 namespace BloombergLP {
 namespace bslalg {
 
-    
                     // =======================================
                     // class HashTableImpUtil_ExtractKeyResult
                     // =======================================
@@ -777,9 +777,9 @@ struct HashTableImpUtil {
         // the first node and the next address of the last node are 0.
 };
 
-// ===========================================================================
+// ============================================================================
 //                  TEMPLATE AND INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                         //-----------------------
                         // class HashTableImpUtil
@@ -892,7 +892,7 @@ void HashTableImpUtil::rehash(HashTableAnchor   *newAnchor,
     BSLS_ASSERT_SAFE(!elementList || !elementList->previousLink());
 
     class Proctor {
-        // An object of this proctor class guarnatees that, on leaving scope,
+        // An object of this proctor class guarantees that, on leaving scope,
         // any remaining elements in the original specified 'elementList' are
         // spliced to the front of the list rooted in the specified 'newAnchor'
         // so that there is only one list for the client to clear if an
@@ -967,7 +967,7 @@ bool HashTableImpUtil::isWellFormed(const HashTableAnchor&  anchor,
     BidirectionalLink  *root  = anchor.listRootAddress();
 
     if (!array || !size) {
-        return false;
+        return false;                                                 // RETURN
     }
 
     if (!root) {
@@ -1063,8 +1063,8 @@ bool HashTableImpUtil::isWellFormed(const HashTableAnchor&  anchor,
     return true;
 }
 
-}  // close namespace BloombergLP::bslalg
-}  // close namespace BloombergLP
+}  // close package namespace
+}  // close enterprise namespace
 
 #endif
 

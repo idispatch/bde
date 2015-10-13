@@ -21,7 +21,7 @@ BSLS_IDENT("$Id$")
 //  BDLDFP_DECIMAL_DD: Portable Decimal64 literal macro
 //  BDLDFP_DECIMAL_DL: Portable Decimal128 literal macro
 //
-//@SEE ALSO: bdldfp_decimalutil, bdldfp_decimalconvertutil,
+//@SEE_ALSO: bdldfp_decimalutil, bdldfp_decimalconvertutil,
 //           bdldfp_decimalplatform
 //
 //@DESCRIPTION: This component provides classes that implement decimal
@@ -398,7 +398,7 @@ BSLS_IDENT("$Id$")
 // operators and aspects.  According to BDE design principles all such
 // functions are placed into a utility component.
 //
-///All Converting Constructors From Integer Types Are Explicit
+///All Converting Constructors from Integer Types are Explicit
 ///- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // This change is necessary to disable the use of comparison operators without
 // explicit casting.  See No Heterogeneous Comparisons Without Casting.
@@ -489,8 +489,8 @@ BSLS_IDENT("$Id$")
 // Because of potential for future improvements in format handling, the
 // operations should not be used for serialization.
 //
-///Preliminary Release - Known Bugs
-///--------------------------------
+///Preliminary Release: Known Bugs
+///-------------------------------
 // Stream output operators do not obey formatting flags or the precision
 // algorithm as required by the TR; they instead print all significant digits
 // all the time.
@@ -613,9 +613,9 @@ typedef Decimal_Type128 Decimal128;
                             // ====================
 
 class Decimal_Type32 {
-    // This value semantic class implements the IEEE-754 32 bit decimal
+    // This value-semantic class implements the IEEE-754 32 bit decimal
     // floating-point interchange format type.  This class is a standard layout
-    // type that is const thread-safe and exception agnostic.
+    // type that is 'const' thread-safe and exception-neutral.
 
   private:
     // DATA
@@ -960,9 +960,9 @@ operator<<(bsl::basic_ostream<CHARTYPE, TRAITS>& stream, Decimal32 object);
                             // ====================
 
 class Decimal_Type64 {
-    // This value semantic class implements the IEEE-754 64 bit decimal
+    // This value-semantic class implements the IEEE-754 64 bit decimal
     // floating-point format arithmetic type.  This class is a standard layout
-    // type that is const thread-safe and exception agnostic.
+    // type that is 'const' thread-safe and exception-neutral.
 
   private:
     // DATA
@@ -2111,9 +2111,9 @@ operator<< (bsl::basic_ostream<CHARTYPE, TRAITS>& stream, Decimal64 object);
                            // =====================
 
 class Decimal_Type128 {
-    // This value semantic class implements the IEEE-754 128 bit decimal
+    // This value-semantic class implements the IEEE-754 128 bit decimal
     // floating-point format arithmetic type.  This class is a standard layout
-    // type that is const thread-safe and exception agnostic.
+    // type that is 'const' thread-safe and exception-neutral.
 
   private:
     // DATA
@@ -4215,7 +4215,7 @@ class numeric_limits<BloombergLP::bdldfp::Decimal128>
 
 };
 
-}  // close std namespace
+}  // close namespace std
 
 #if defined(BDLDFP_DECIMAL_RESTORE_STD)
 #   define std bsl

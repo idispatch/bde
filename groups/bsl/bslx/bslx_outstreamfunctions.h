@@ -65,7 +65,7 @@ BSLS_IDENT("$Id: $")
 // contract.
 //
 ///Implementing BDEX Streaming in Value-Semantic Template Classes
-///- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // The author of a non-template value-semantic type has full knowledge of the
 // details of the "value" of that type, and may choose to use the appropriate
 // output stream 'put' methods directly when implementing the required
@@ -486,6 +486,10 @@ BSLS_IDENT("$Id: $")
 #include <bslx_versionfunctions.h>
 #endif
 
+#ifndef INCLUDED_BSLMF_ASSERT
+#include <bslmf_assert.h>
+#endif
+
 #ifndef INCLUDED_BSLMF_IF
 #include <bslmf_if.h>
 #endif
@@ -504,6 +508,10 @@ BSLS_IDENT("$Id: $")
 
 #ifndef INCLUDED_BSL_VECTOR
 #include <bsl_vector.h>
+#endif
+
+#ifndef INCLUDED_BSL_CSTDINT
+#include <bsl_cstdint.h>
 #endif
 
 namespace BloombergLP {
@@ -912,7 +920,7 @@ namespace OutStreamFunctions {
         // more information on BDEX streaming of value-semantic types and
         // containers.
 
-}  // close OutStreamFunctions namespace
+}  // close namespace OutStreamFunctions
 
 // ============================================================================
 //                          INLINE FUNCTION DEFINITIONS
@@ -929,6 +937,13 @@ STREAM& OutStreamFunctions::bdexStreamOutImp(STREAM&           stream,
                                              int            /* version */,
                                              const IsEnumType&)
 {
+    // A compilation error indicating the next line of code implies the 'TYPE'
+    // cannot be represented as a 32-bit 'int' and an overload for the
+    // 'OutStreamFunctions::bdexStreamOut' function, in the enumeration's
+    // namespace, should be provided.
+
+    BSLMF_ASSERT(sizeof(TYPE) <= sizeof(bsl::int32_t));
+
     // Stream the 'enum' value as a 32-bit 'int'.
     return stream.putInt32(static_cast<int>(value));
 }

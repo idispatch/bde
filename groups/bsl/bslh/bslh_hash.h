@@ -131,9 +131,9 @@ BSLS_IDENT("$Id: $")
 ///-----
 // This section illustrates intended usage of this component.
 //
-///Example 1: Keying a hash table with a user defined type
+///Example 1: Keying a Hash Table with a User-Defined Type
 ///- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Suppose we have a value semantic type, 'Box', that contains attributes that
+// Suppose we have a value-semantic type, 'Box', that contains attributes that
 // are salient to hashing as well as attributes that are not salient to
 // hashing.  Some of these attributes are themselves user defined types.  We
 // want to store objects of type 'Box' in a hash table, so we need to be able
@@ -147,7 +147,7 @@ BSLS_IDENT("$Id: $")
 // two dimensional Cartesian plane.
 //..
 //  class Point {
-//      // This class is a value semantic type that represents a two
+//      // This class is a value-semantic type that represents a two
 //      // dimensional location on a Cartesian plane.
 //
 //    private:
@@ -227,11 +227,11 @@ BSLS_IDENT("$Id: $")
 //      hashAppend(hashAlg, point.getY());
 //  }
 //..
-// Then, we declare another value semantic type, 'Box' that will have a 'Point'
+// Then, we declare another value-semantic type, 'Box' that will have a 'Point'
 // as one of its attributes that are salient to hashing.
 //..
 //  class Box {
-//      // This class is a value semantic type that represents a box drawn on
+//      // This class is a value-semantic type that represents a box drawn on
 //      // to a Cartesian plane.
 //
 //    private:
@@ -570,7 +570,7 @@ hashAppend(HASH_ALGORITHM& hashAlg, TYPE input);
     // into the internal state of the algorithm which is used to produce the
     // resulting hash value. Note that the 'enable_if' meta-function is used to
     // enable this 'hashAppend' function for only 'long double', because on
-    // some compilers 'long double's contain garabage and can not be hashed as
+    // some compilers 'long double's contain garbage and can not be hashed as
     // a continuous sequence of bytes.
 
 template <class HASH_ALGORITHM, size_t N>
@@ -775,7 +775,7 @@ namespace bslmf {
 template <class TYPE>
 struct IsBitwiseMoveable<bslh::Hash<TYPE> >
     : bsl::true_type {};
-}  // close traits namespace
+}  // close namespace bslmf
 
 
 }  // close enterprise namespace
@@ -790,7 +790,7 @@ template <class TYPE>
 struct is_trivially_copyable< ::BloombergLP::bslh::Hash<TYPE> >
 : bsl::true_type
 {};
-}  // close traits namespace
+}  // close namespace bsl
 
 
 

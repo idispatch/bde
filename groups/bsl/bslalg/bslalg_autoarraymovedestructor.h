@@ -24,7 +24,7 @@ BSLS_IDENT("$Id: $")
 // example.
 //
 // Overview of the operation of 'AutoArrayMoveDestructor':
-// ------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Supposee we want to double the length of an array by prepending copies a
 // 'value' at the start of the array.  Note that we assume there is ample
 // uninitialized memory after the end of the initial array for these new
@@ -43,7 +43,7 @@ BSLS_IDENT("$Id: $")
 //..
 // The copy constructor for the type being inserted may throw, so we need to
 // have a guard object which allows us to make some guarantee about the state
-// of the array after the guard is destroyed.  What we want to guarantee is 
+// of the array after the guard is destroyed.  What we want to guarantee is
 // that there are as many valid objects at the start of the array as before
 // with no other valid objects in existence.
 //
@@ -320,9 +320,9 @@ class AutoArrayMoveDestructor {
         // destruction, moves the range '[ begin, middle )' to the specified
         // 'destination' and destroys the '[ middle, end )' range.  The
         // behavior is undefined unless 'begin', 'middle', and 'end' refer to
-        // a contiguous sequence of initialized 'OBJECT_TYPE' objects, where 
+        // a contiguous sequence of initialized 'OBJECT_TYPE' objects, where
         // 'begin <= middle <= end', and 'destination' refers to a contiguous
-        // sequence of (uninitialized) memory of sufficent size to hold 
+        // sequence of (uninitialized) memory of sufficient size to hold
         // 'end - begin' 'OBJECT_TYPE' objects (which must not overlap
         // '[begin, end)').
 
@@ -352,9 +352,9 @@ class AutoArrayMoveDestructor {
         // Return the address at the middle of the guarded range.
 };
 
-// ===========================================================================
+// ============================================================================
 //                         INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                     // -----------------------------
                     // class AutoArrayMoveDestructor

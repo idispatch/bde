@@ -14,7 +14,7 @@ BSLS_IDENT("$Id: $")
 //
 //@SEE_ALSO: bslalg_scalarprimitives, bslalg_arrayprimitives
 //
-//@DESCRIPTION: This component provides utilies to initialize, destroy, move,
+//@DESCRIPTION: This component provides utilities to initialize, destroy, move,
 // and otherwise perform various primitive manipulations on deques with a
 // uniform interface, but selecting a different implementation according to the
 // various traits possessed by the underlying type, and selecting a simpler
@@ -74,6 +74,7 @@ BSLS_IDENT("$Id: $")
 //                                                moveable trait", or
 //                                                "TYPE is bit-wise moveable"
 //..
+//
 ///Aliasing
 ///--------
 // There are some aliasing concerns in this component, due to the presence of
@@ -170,7 +171,7 @@ namespace {
         NON_NIL_TRAITS          = 3
     };
 
-}
+}  // close unnamed namespace
 
 namespace bslalg {
 
@@ -736,9 +737,9 @@ class DequePrimitives_DequeMoveGuard {
         // Set the size of the range guarded by this object to be zero.
 };
 
-// ===========================================================================
+// ============================================================================
 //                      INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                         // ---------------------
                         // class DequePrimitives

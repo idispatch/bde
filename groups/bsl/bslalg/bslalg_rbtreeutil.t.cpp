@@ -1,4 +1,4 @@
-// bslag_rbtreeutil.t.cpp                                             -*-C++-*-
+// bslalg_rbtreeutil.t.cpp                                            -*-C++-*-
 #include <bslalg_rbtreeutil.h>
 
 #include <bslalg_arrayprimitives.h>
@@ -46,7 +46,7 @@ using namespace bslalg;
 // this type on a variety of types.  Note that because of package dependencies
 // this test-driver cannot depend on 'bsltf'.
 //-----------------------------------------------------------------------------
-// CLASS METHODS
+//                              CLASS METHODS
 // ----------------------------------------------------------------------------
 // Navigation
 // [ 4] const RbTreeNode *leftmost(const RbTreeNode *);
@@ -93,30 +93,34 @@ using namespace bslalg;
 
 //=============================================================================
 
-//=============================================================================
-//                  STANDARD BDE ASSERT TEST MACRO
-//-----------------------------------------------------------------------------
-// NOTE: THIS IS A LOW-LEVEL COMPONENT AND MAY NOT USE ANY C++ LIBRARY
-// FUNCTIONS, INCLUDING IOSTREAMS.
+// ============================================================================
+//                     STANDARD BSL ASSERT TEST FUNCTION
+// ----------------------------------------------------------------------------
 
 namespace {
 
 int testStatus = 0;
 
-void aSsErT(bool b, const char *s, int i) {
-    if (b) {
-        printf("Error " __FILE__ "(%d): %s    (failed)\n", i, s);
-        if (testStatus >= 0 && testStatus <= 100) ++testStatus;
+void aSsErT(bool condition, const char *message, int line)
+{
+    if (condition) {
+        printf("Error " __FILE__ "(%d): %s    (failed)\n", line, message);
+
+        if (0 <= testStatus && testStatus <= 100) {
+            ++testStatus;
+        }
     }
 }
 
-}
+}  // close unnamed namespace
 
-//=============================================================================
-//                       STANDARD BDE TEST DRIVER MACROS
-//-----------------------------------------------------------------------------
+// ============================================================================
+//               STANDARD BSL TEST DRIVER MACRO ABBREVIATIONS
+// ----------------------------------------------------------------------------
 
 #define ASSERT       BSLS_BSLTESTUTIL_ASSERT
+#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
+
 #define LOOP_ASSERT  BSLS_BSLTESTUTIL_LOOP_ASSERT
 #define LOOP0_ASSERT BSLS_BSLTESTUTIL_LOOP0_ASSERT
 #define LOOP1_ASSERT BSLS_BSLTESTUTIL_LOOP1_ASSERT
@@ -125,13 +129,12 @@ void aSsErT(bool b, const char *s, int i) {
 #define LOOP4_ASSERT BSLS_BSLTESTUTIL_LOOP4_ASSERT
 #define LOOP5_ASSERT BSLS_BSLTESTUTIL_LOOP5_ASSERT
 #define LOOP6_ASSERT BSLS_BSLTESTUTIL_LOOP6_ASSERT
-#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
 
-#define Q   BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
-#define P   BSLS_BSLTESTUTIL_P   // Print identifier and value.
-#define P_  BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
-#define T_  BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
-#define L_  BSLS_BSLTESTUTIL_L_  // current Line number
+#define Q            BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
+#define P            BSLS_BSLTESTUTIL_P   // Print identifier and value.
+#define P_           BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLS_BSLTESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -153,10 +156,9 @@ typedef RbTreeNode::Color Color;
 const RbTreeNode::Color RED   = RbTreeNode::BSLALG_RED;
 const RbTreeNode::Color BLACK = RbTreeNode::BSLALG_BLACK;
 
-static bool verbose;
-static bool veryVerbose;
-static bool veryVeryVerbose;
-static bool veryVeryVeryVerbose;
+static bool         verbose = false;
+static bool     veryVerbose = false;
+static bool veryVeryVerbose = false;
 
 // ============================================================================
 //                         GLOBAL CLASSES FOR TESTING
@@ -243,7 +245,7 @@ IntNode *toIntNode(RbTreeNode *node)
 int prevIntNodeValue(const RbTreeAnchor& tree, RbTreeNode *node)
 {
     if (tree.firstNode() == node) {
-        return INT_MIN;
+        return INT_MIN;                                               // RETURN
     }
     RbTreeNode *prev = Obj::previous(node);
     return toIntNode(prev)->value();
@@ -253,7 +255,7 @@ int nextIntNodeValue(const RbTreeAnchor& tree, RbTreeNode *node)
 {
     RbTreeNode *next = Obj::next(node);
     if (tree.sentinel() == next) {
-        return INT_MAX;
+        return INT_MAX;                                               // RETURN
     }
     return toIntNode(next)->value();
 }
@@ -422,7 +424,7 @@ const RbTreeNode *testNodeAtIndex(const IntNode       *nodes,
     return nodeIndex >= 0 ? &nodes[nodeIndex] : tree.sentinel();
 }
 
-template <typename NODE_COMPARATOR, typename NODE_PRINT_FUNC>
+template <class NODE_COMPARATOR, class NODE_PRINT_FUNC>
 int validateTestRbTree(const RbTreeNode       *rootNode,
                        const NODE_COMPARATOR&  comparator,
                        const NODE_PRINT_FUNC&  nodePrintFunction)
@@ -459,7 +461,7 @@ int validateIntRbTree(const RbTreeNode *rootNode)
 
 
 
-template <typename VALUE>
+template <class VALUE>
 class Array {
     // This class provides an array of objects of the parameterized 'VALUE'
     // type.  The size of the array is initialized by a call to 'reset'.  Note
@@ -697,10 +699,10 @@ bool areTreesEqual(const RbTreeNode       *left,
 {
 
     if (0 == left && 0 == right) {
-        return true;
+        return true;                                                  // RETURN
     }
     if (0 == left || 0 == right) {
-        return false;
+        return false;                                                 // RETURN
     }
     return (!comparator(*left, *right) && !comparator(*right, *left))
         && areTreesEqual(left->leftChild(), right->leftChild(), comparator)
@@ -711,7 +713,7 @@ int countNodes(RbTreeNode *node)
     // Return the count of nodes under (and including) the specified 'node'.
 {
     if (0 == node) {
-        return 0;
+        return 0;                                                     // RETURN
     }
     return 1 + countNodes(node->leftChild()) + countNodes(node->rightChild());
 }
@@ -754,7 +756,7 @@ bool isInRange(const RbTreeNode *node,
     RbTreeNodeRangeIterator it(first, last);
     for (RbTreeNode *itNode = it.next(); 0 != itNode; itNode = it.next()) {
         if (node == itNode) {
-            return true;
+            return true;                                              // RETURN
         }
     }
     return false;
@@ -1044,8 +1046,8 @@ class AllocTestType {
 namespace BloombergLP {
 namespace bslma {
 template <> struct UsesBslmaAllocator<AllocTestType> : bsl::true_type {};
-}
-}
+}  // close namespace bslma
+}  // close enterprise namespace
 
 // FREE OPERATORS
 bool operator==(const AllocTestType& lhs, const AllocTestType& rhs);
@@ -1143,7 +1145,7 @@ bool operator!=(const AllocTestType& lhs, const AllocTestType& rhs)
                         // class TestTypeValue
                         // ===================
 
-template <typename VALUE>
+template <class VALUE>
 struct TestTypeValue {
     // Provide a functor for creating values of the parameterized 'VALUE'
     // type from an int, and to load an int from an object of the
@@ -1234,7 +1236,7 @@ struct TestTypeValue<SimpleTestType> {
                         // class TestTypeComparator
                         // ========================
 
-template <typename VALUE>
+template <class VALUE>
 struct TestTypeComparator {
     bool operator()(const VALUE& lhs, const VALUE& rhs) const {
         return lhs < rhs;
@@ -1373,7 +1375,7 @@ class TestTreeNodeAssign {
                         // struct TestNodeFactory
                         // ======================
 
-template <typename VALUE>
+template <class VALUE>
 class TestNodeFactory {
 
   public:
@@ -1611,7 +1613,7 @@ const char *ggParseNode(
                  spec);
 
     if ('}' == *currentChar) {
-        return currentChar + 1;
+        return currentChar + 1;                                       // RETURN
     }
 
     if ('.' == *currentChar) {
@@ -1712,7 +1714,7 @@ void gg(RbTreeAnchor                *tree,
     if (numNodes == 0) {
         PARSE_ASSERT('.' == *ltrim(spec), spec);
         tree->reset(0, tree->sentinel(), 0);
-        return;
+        return;                                                       // RETURN
     }
 
     nodes->reset(numNodes);
@@ -1735,13 +1737,13 @@ void intNodeTreeToSpec(IntNode *root)
 {
     if (0 == root) {
         printf(".");
-        return;
+        return;                                                       // RETURN
     }
 
     printf("{%d:%c", root->value(), (root->isRed() ? 'R' : 'B'));
     if (0 == root->leftChild() && 0 == root->rightChild()) {
         printf("}");
-        return;
+        return;                                                       // RETURN
     }
     printf(" ");
     intNodeTreeToSpec(static_cast<IntNode*>(root->leftChild()));
@@ -2420,7 +2422,7 @@ const int NUM_TREE_VALUES         = NUM_TREE_VALUES_W_EMPTY - 1;
 template <class VALUE>
 class TestDriver {
     // This templatized struct provide a namespace for testing 'RbTreeUtil'
-    // functions having template parameters. The parameterized 'VALUE'
+    // functions having template parameters.  The parameterized 'VALUE'
     // specifies the type of the nodes held within the tree.  Each
     // "testCase*" method tests a specific aspect of 'RbTreeUtil', and should
     // be invoked with various parameterized types to full test 'RbTreeUtil'.
@@ -3070,7 +3072,8 @@ void TestDriver<VALUE>::testCase8()
     //   7 That 'isWellFormed' returns 'false' if the node count is not the
     //     number of nodes in the tree.
 
-    if (veryVerbose) printf("\tTest that numNodes is not a correct count.\n");
+    if (veryVerbose) printf(
+                             "\tTest that numNodes is not a correct count.\n");
 
     for (int i = 0; i < NUM_VALUES; ++i) {
         const int   LINE        = VALUES[i].d_line;
@@ -3243,7 +3246,8 @@ void TestDriver<VALUE>::testCase9()
         }
     }
 
-    if (veryVerbose) printf("\tinsert every possible combination of [0..6]\n");
+    if (veryVerbose) printf(
+                            "\tinsert every possible combination of [0..6]\n");
     {
         int       VALUES[]   = { 0, 1, 2, 3, 4, 5, 6 };
         const int NUM_VALUES = sizeof(VALUES) / sizeof(*VALUES);
@@ -3468,7 +3472,8 @@ void TestDriver<VALUE>::testCase10()
         }
     }
 
-    if (veryVerbose) printf("\tTest finding nodes in the set of test trees\n");
+    if (veryVerbose) printf(
+                            "\tTest finding nodes in the set of test trees\n");
     {
         const TreeSpec *VALUES     = TREE_VALUES;
         const int       NUM_VALUES = NUM_TREE_VALUES;
@@ -5694,11 +5699,15 @@ void TestDriver<VALUE>::testCase21()
 
 int main(int argc, char *argv[])
 {
-    int  test = argc > 1 ? atoi(argv[1]) : 0;
-    verbose = argc > 2;
-    veryVerbose = argc > 3;
-    veryVeryVerbose = argc > 4;
-    veryVeryVeryVerbose = argc > 5;
+    int                 test = argc > 1 ? atoi(argv[1]) : 0;
+                     verbose = argc > 2;
+                 veryVerbose = argc > 3;
+             veryVeryVerbose = argc > 4;
+    bool veryVeryVeryVerbose = argc > 5;
+
+    (void)veryVeryVeryVerbose;  // suppress warning
+
+    setbuf(stdout, NULL);    // Use unbuffered output
 
     printf("TEST " __FILE__ " CASE %d\n", test);
 
@@ -5850,7 +5859,7 @@ int main(int argc, char *argv[])
         //: 4 The optional 'level' and 'spacesPerLevel' parameters have the
         //:   correct default values.
         //
-        //Plan
+        // Plan:
         //: 1 Create a series of test trees, with varying values for level and
         //:   spacesPerLevel, and their expected print output.  Print to a
         //:   temporary file and verify the output matches the expected
@@ -5996,7 +6005,7 @@ int main(int argc, char *argv[])
         //: 6 QoI: Asserted precondition violations are detected when
         //:   enabled.
         //
-        // Plan
+        // Plan:
         //: 1 Create a series of test trees with a selected rotation node, and
         //:   an expected result for the rotation.  Verify a left-rotation
         //:   generates the expected result, and that the tree is correctly

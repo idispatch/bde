@@ -132,7 +132,7 @@ BSLS_IDENT("$Id: $")
 // This section illustrates intended use of this component.
 //
 ///Example 1: Using a 'bdlma::Pool' for Efficient Memory Allocation
-///- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // A 'bdlma::Pool' can be used by node-based containers (such as lists, trees,
 // and hash tables that hold multiple elements of uniform size) for efficient
 // memory allocation of new elements.  The following container template class,
@@ -158,9 +158,13 @@ BSLS_IDENT("$Id: $")
 //      bsl::vector<TYPE *> d_array_p;  // array of pooled elements
 //      bdlma::Pool         d_pool;     // memory manager for array elements
 //
+//    private:
+//      // Not implemented:
+//      my_PooledArray(const my_PooledArray&);
+//
 //    public:
 //      // CREATORS
-//      my_PooledArray(bslma::Allocator *basicAllocator = 0);
+//      explicit my_PooledArray(bslma::Allocator *basicAllocator = 0);
 //          // Create a pooled array that stores the 'TYPE' element values
 //          // "out-of-place".  Optionally specify a 'basicAllocator' used to
 //          // supply memory.  If 'basicAllocator' is 0, the currently
@@ -177,7 +181,7 @@ BSLS_IDENT("$Id: $")
 //          // Remove all elements from this array.
 //
 //      // ACCESSORS
-//      int length() const;
+//      bsl::size_t length() const;
 //          // Return the number of elements in this array.
 //
 //      const TYPE& operator[](int index) const;
@@ -205,7 +209,7 @@ BSLS_IDENT("$Id: $")
 //  // ACCESSORS
 //  template <class TYPE>
 //  inline
-//  int my_PooledArray<TYPE>::length() const
+//  bsl::size_t my_PooledArray<TYPE>::length() const
 //  {
 //      return d_array_p.size();
 //  }
@@ -215,7 +219,7 @@ BSLS_IDENT("$Id: $")
 //  const TYPE& my_PooledArray<TYPE>::operator[](int index) const
 //  {
 //      assert(0     <= index);
-//      assert(index <  length());
+//      assert(index <  static_cast<int>(length()));
 //
 //      return *d_array_p[index];
 //  }
@@ -227,7 +231,6 @@ BSLS_IDENT("$Id: $")
 // those provided by 'bdlma::Pool':
 //..
 //  // my_poolarray.cpp
-//  #include <my_poolarray.h>
 //
 //  // CREATORS
 //  template <class TYPE>
@@ -288,15 +291,15 @@ BSLS_IDENT("$Id: $")
 #endif
 
 #ifndef INCLUDED_BSL_CSTDDEF
-#include <bsl_cstddef.h>        // for 'bsl::size_t'
+#include <bsl_cstddef.h>
 #endif
 
 namespace BloombergLP {
 namespace bdlma {
 
-                        // ==========
-                        // class Pool
-                        // ==========
+                                // ==========
+                                // class Pool
+                                // ==========
 
 class Pool {
     // This class implements a memory pool that allocates and manages memory
@@ -320,8 +323,8 @@ class Pool {
     int   d_blockSize;          // size (in bytes) of each allocated memory
                                 // block returned to client
 
-    int   d_internalBlockSize;  // actual size of each block maintained on
-                                // free list (contains overhead for 'Link')
+    int   d_internalBlockSize;  // actual size of each block maintained on free
+                                // list (contains overhead for 'Link')
 
     int   d_chunkSize;          // current chunk size (in blocks-per-chunk)
 
@@ -335,12 +338,15 @@ class Pool {
     InfrequentDeleteBlockList
           d_blockList;          // memory manager for allocated memory
 
+    char *d_begin_p;            // start of a contiguous group of memory blocks
+
+    char *d_end_p;              // end of a contiguous group of memory blocks
+
   private:
     // PRIVATE MANIPULATORS
     void replenish();
         // Dynamically allocate a new chunk using this pool's underlying growth
-        // strategy, and use the chunk to replenish the free memory list of
-        // this pool.
+        // strategy.
 
   private:
     // NOT IMPLEMENTED
@@ -350,8 +356,7 @@ class Pool {
   public:
     // CREATORS
     explicit
-    Pool(int                          blockSize,
-         bslma::Allocator            *basicAllocator = 0);
+    Pool(int blockSize, bslma::Allocator *basicAllocator = 0);
     Pool(int                          blockSize,
          bsls::BlockGrowth::Strategy  growthStrategy,
          bslma::Allocator            *basicAllocator = 0);
@@ -492,26 +497,32 @@ void operator delete(void *address, BloombergLP::bdlma::Pool& pool);
     // to be called in the case of an exception.
 
 // ============================================================================
-//                      INLINE FUNCTION DEFINITIONS
+//                             INLINE DEFINITIONS
 // ============================================================================
 
 namespace BloombergLP {
 namespace bdlma {
 
-                        // ----------
-                        // class Pool
-                        // ----------
+                                // ----------
+                                // class Pool
+                                // ----------
 
 // MANIPULATORS
 inline
 void *Pool::allocate()
 {
-    if (!d_freeList_p) {
+    if (d_begin_p == d_end_p) {
+        if (d_freeList_p) {
+            Link *p      = d_freeList_p;
+            d_freeList_p = p->d_next_p;
+            return p;                                                 // RETURN
+        }
+
         replenish();
     }
 
-    Link *p      = d_freeList_p;
-    d_freeList_p = p->d_next_p;
+    char *p = d_begin_p;
+    d_begin_p += d_internalBlockSize;
     return p;
 }
 
@@ -543,6 +554,8 @@ void Pool::release()
 {
     d_blockList.release();
     d_freeList_p = 0;
+    d_begin_p = 0;
+    d_end_p = 0;
 }
 
 // ACCESSORS
@@ -562,7 +575,7 @@ void *operator new(bsl::size_t size, BloombergLP::bdlma::Pool& pool)
     using namespace BloombergLP;
 
     BSLS_ASSERT_SAFE(
-        static_cast<int>(size) <= pool.blockSize() && 
+        static_cast<int>(size) <= pool.blockSize() &&
         bsls::AlignmentUtil::calculateAlignmentFromSize(size)
          <= bsls::AlignmentUtil::calculateAlignmentFromSize(pool.blockSize()));
 
@@ -581,7 +594,7 @@ void operator delete(void *address, BloombergLP::bdlma::Pool& pool)
 #endif
 
 // ----------------------------------------------------------------------------
-// Copyright 2012 Bloomberg Finance L.P.
+// Copyright 2015 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

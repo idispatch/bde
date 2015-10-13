@@ -14,7 +14,7 @@ BSLS_IDENT("$Id: $")
 //
 //@SEE_ALSO: bslalg_scalarprimitives, bslalg_typetraits
 //
-//@DESCRIPTION: This component provides utilies to destroy arrays with a
+//@DESCRIPTION: This component provides utilities to destroy arrays with a
 // uniform interface, but selecting a different implementation according to the
 // traits possessed by the underlying type.
 //
@@ -30,6 +30,7 @@ BSLS_IDENT("$Id: $")
 //                                    behavior.
 //
 //..
+//
 ///Usage
 ///-----
 // In this section we show intended use of this component.  Note that this
@@ -161,9 +162,9 @@ struct ArrayDestructionPrimitives {
         // calls).
 };
 
-// ===========================================================================
+// ============================================================================
 //                      INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                   // ---------------------------------
                   // struct ArrayDestructionPrimitives
@@ -207,7 +208,8 @@ void ArrayDestructionPrimitives::destroy(TARGET_TYPE *begin,
     BSLS_ASSERT_SAFE(end   || !begin);
     BSLS_ASSERT_SAFE(begin <= end);
 
-    destroy(begin, end,
+    destroy(begin,
+            end,
             typename bsl::is_trivially_copyable<TARGET_TYPE>::type());
 }
 

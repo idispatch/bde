@@ -21,7 +21,7 @@ BSLS_IDENT("$Id$ $CSID$")
 // object.  When all references to the in-place object are released (using
 // 'releaseRef'), the destructor of 'TYPE' is invoked.
 //
-///Thread-Safety
+///Thread Safety
 ///-------------
 // 'bslma::SharedPtrInplaceRep' is thread-safe provided that 'disposeObject'
 // and 'disposeRep' are not called explicitly, meaning that all non-creator
@@ -454,7 +454,7 @@ template <class... ARGS>
 SharedPtrInplaceRep<TYPE>::SharedPtrInplaceRep(Allocator *basicAllocator,
                                                ARGS&&...  args)
 : d_allocator_p(basicAllocator)
-, d_instance(bsls::Util::forward<ARGS>(args)...)
+, d_instance(BSLS_COMPILERFEATURES_FORWARD(ARGS,args)...)
 {
 }
 # else

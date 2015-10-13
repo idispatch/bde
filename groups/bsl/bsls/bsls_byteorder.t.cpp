@@ -93,16 +93,16 @@ static void aSsErT(int c, const char *s, int i)
 
 #define L_ __LINE__                                     // current Line number
 
-//==========================================================================
+//=============================================================================
 //                         GLOBAL TYPEDEF FOR TESTING
-//--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 typedef BloombergLP::bsls::Types::Int64  Int64;
 typedef BloombergLP::bsls::Types::Uint64 Uint64;
 
-//==========================================================================
+//=============================================================================
 //                    GLOBAL HELPER FUNCTIONS FOR TESTING
-//--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void printHex(const char * c, int size)
     // Print the specified character array 'c' with the specified 'size' in
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
                                << "====================" << std::endl;
 
         if (verbose) std::cout <<
-            "\nTesting macro in unbracketed conext and absence of using"
+            "\nTesting macro in unbracketed context and absence of using"
             "namespace BloombergLP" << std::endl;
 
         // Input values

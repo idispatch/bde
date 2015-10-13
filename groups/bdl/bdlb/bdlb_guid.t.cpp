@@ -1,16 +1,17 @@
 // bdlb_guid.t.cpp                                                    -*-C++-*-
 #include <bdlb_guid.h>
 
-#include <bsl_cstdlib.h>
-#include <bsl_cstring.h>
-#include <bsl_iostream.h>
-#include <bsl_sstream.h>
-#include <bsl_string.h>
-#include <bsl_strstream.h>
+#include <bslim_testutil.h>
 
 #include <bslmf_assert.h>
 
-#include <bsls_bsltestutil.h>
+#include <bsl_cstdlib.h>
+#include <bsl_cstring.h>
+#include <bsl_iostream.h>
+#include <bsl_set.h>
+#include <bsl_sstream.h>
+#include <bsl_string.h>
+#include <bsl_sstream.h>
 
 using namespace BloombergLP;
 using namespace bsl;
@@ -60,6 +61,7 @@ using namespace bsl;
 // [12] bool operator> (const bdlb::Guid& lhs, const bdlb::Guid& rhs);
 // [12] bool operator>=(const bdlb::Guid& lhs, const bdlb::Guid& rhs);
 // [ 5] bsl::ostream& operator<<(bsl::ostream& stream, const Guid& guid);
+// [15] bslh::Hash<>
 //
 // TRAITS
 // [13] bslmf::IsBitwiseEqualityComparable
@@ -69,7 +71,7 @@ using namespace bsl;
 // [ 4] bdlb::Guid& gg(bdlb::Guid *object, const char *spec);
 // [ 8] bdlb::Guid g(const char *spec);
 // [ 4] int ggg(bdlb::Guid *object, const char *spec, int vF = 1);
-// [15] USAGE EXAMPLE
+// [16] USAGE EXAMPLE
 // [10] int maxSupportedBdexVersion() const;
 // [10] STREAM& bdexStreamIn(STREAM& stream, int version);
 // [10] STREAM& bdexStreamOut(STREAM& stream, int version) const;
@@ -97,26 +99,26 @@ void aSsErT(bool condition, const char *message, int line)
 }  // close unnamed namespace
 
 // ============================================================================
-//               STANDARD BSL TEST DRIVER MACRO ABBREVIATIONS
+//               STANDARD BDE TEST DRIVER MACRO ABBREVIATIONS
 // ----------------------------------------------------------------------------
 
-#define ASSERT       BSLS_BSLTESTUTIL_ASSERT
-#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define LOOP_ASSERT  BSLS_BSLTESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BSLS_BSLTESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BSLS_BSLTESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BSLS_BSLTESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BSLS_BSLTESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BSLS_BSLTESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BSLS_BSLTESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BSLS_BSLTESTUTIL_LOOP6_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
 
-#define Q            BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
-#define P            BSLS_BSLTESTUTIL_P   // Print identifier and value.
-#define P_           BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
-#define T_           BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
-#define L_           BSLS_BSLTESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -371,7 +373,7 @@ int main(int argc, char *argv[])
     cout << "TEST " << __FILE__ << " CASE " << test << endl;;
 
     switch (test)  { case 0:
-      case 15: {
+      case 16: {
         // --------------------------------------------------------------------
         // USAGE EXAMPLE
         //   Extracted from component header file.
@@ -406,6 +408,53 @@ int main(int argc, char *argv[])
             previousFileName = uniqueFileName;
         }
 //..
+      } break;
+      case 15: {
+        // --------------------------------------------------------------------
+        // TESTING HASH FUNCTION
+        //
+        // Concerns:
+        //: 1 A guid object can be hashed by instances of
+        //:   'bsl::hash<bdlb::Guid>'.
+        //:
+        //: 2 A small sample of different guid objects produce different
+        //:   hashes.
+        //:
+        //: 3 Invoking 'bsl::hash<bdlb::Guid>' is identical to invoking
+        //:   'bslh::DefaultHashAlgorithm' on the underlying data of the guid
+        //:   object.
+        //
+        // Plan:
+        //: 1 Hash some different guid objects and verify that the result of
+        //:   using 'bsl::hash<bdlb::Guid>' is identical to invoking
+        //:   'bslh::DefaultHashAlgorithm' on the underlying data of the guid
+        //:   object.
+        //:
+        //: 2 Hash a number of different guid objects and verify that they
+        //:   produce distinct hashes.
+        //
+        // Testing:
+        //   bsl::hash<bdlb::Guid>
+        //   bslh::Hash<>
+        // --------------------------------------------------------------------
+        if (verbose) cout << endl
+                          << "TESTING HASH FUNCTION" << endl
+                          << "=====================" << endl;
+
+        const bsl::size_t NUM_VALUES = sizeof(VALUES) / sizeof(VALUES[0]);
+
+        bsl::hash<Obj>        bslHashFunction;
+        bsl::set<bsl::size_t> hashResults;
+
+        for (bsl::size_t i = 0; i < NUM_VALUES; ++i) {
+            Obj guid(VALUES[i]);
+            bslh::DefaultHashAlgorithm defaultHashAlgorithm;
+            defaultHashAlgorithm(guid.data(), 16);
+            ASSERT(bslHashFunction(guid) ==
+                                           defaultHashAlgorithm.computeHash());
+            hashResults.insert(bslHashFunction(guid));
+        }
+        ASSERT(hashResults.size() == NUM_VALUES);
       } break;
       case 14: {
         // --------------------------------------------------------------------
@@ -577,11 +626,12 @@ int main(int argc, char *argv[])
         // Plan:
         //: 1 For each of an enumerated set of object, 'level', and
         //:   'spacesPerLevel' values, ordered by increasing object length, use
-        //:   'ostrstream' to 'print' that object's value, using the tabulated
-        //:   parameters, to two separate character buffers each with different
-        //:   initial values.  Compare the contents of these buffers with the
-        //:   literal expected output format and verify that the characters
-        //:   beyond the null characters are unaffected in both buffers.
+        //:   'ostringstream' to 'print' that object's value, using the
+        //:   tabulated parameters, to two separate character buffers each with
+        //:   different initial values.  Compare the contents of these buffers
+        //:   with the literal expected output format and verify that the
+        //:   characters beyond the null characters are unaffected in both
+        //:   buffers.
         //
         // Testing:
         //   ostream& print(ostream& stream, int level, int sp) const;
@@ -652,31 +702,35 @@ int main(int argc, char *argv[])
                 const int         SPL    = DATA[ti].d_spaces;
                 const char *const FMT    = DATA[ti].d_fmt_p;
 
-                char buf1[SIZE], buf2[SIZE];
-                memcpy(buf1, CTRL_BUF1, SIZE); // Preset buf1 to Z1 values.
-                memcpy(buf2, CTRL_BUF2, SIZE); // Preset buf2 to Z2 values.
-
                 Obj        mX;
                 const Obj& X = gg(&mX, SPEC);
 
-
                 if (veryVerbose) { P_(SPEC) P_(IND) P_(SPL) P(FMT) }
-                ostrstream out1(buf1, SIZE);  X.print(out1, IND, SPL) << ends;
-                ostrstream out2(buf2, SIZE);  X.print(out2, IND, SPL) << ends;
-                if (veryVerbose) { P(buf1) }
+                ostringstream out1(bsl::string(CTRL_BUF1, SIZE));
+                X.print(out1, IND, SPL) << ends;
+                ostringstream out2(bsl::string(CTRL_BUF2, SIZE));
+                X.print(out2, IND, SPL) << ends;
+                if (veryVerbose) { P(out1.str()) }
                 const int SZ = strlen(FMT) + 1;
                 const int REST = SIZE - SZ;
                 LOOP_ASSERT(LINE, SZ < SIZE);  // Check buffer is large enough.
-                LOOP_ASSERT(LINE, Z1 == buf1[SIZE - 1]);  // Check for overrun.
-                LOOP_ASSERT(LINE, Z2 == buf2[SIZE - 1]);  // Check for overrun.
-
-                LOOP2_ASSERT(LINE, SZ, 0 == strncmp(buf1, FMT, SZ - 1));
-                LOOP2_ASSERT(LINE, SZ, 0 == strncmp(buf2, FMT, SZ - 1));
-
                 LOOP_ASSERT(LINE,
-                                 0 == memcmp(buf1 + SZ, CTRL_BUF1 + SZ, REST));
+                            Z1 == out1.str()[SIZE - 1]);  // Check for overrun.
                 LOOP_ASSERT(LINE,
-                                 0 == memcmp(buf2 + SZ, CTRL_BUF2 + SZ, REST));
+                            Z2 == out2.str()[SIZE - 1]);  // Check for overrun.
+                LOOP2_ASSERT(LINE,
+                             SZ,
+                             0 == strncmp(out1.str().c_str(), FMT, SZ - 1));
+                LOOP2_ASSERT(LINE,
+                             SZ,
+                             0 == strncmp(out2.str().c_str(), FMT, SZ - 1));
+
+                LOOP_ASSERT(LINE, 0 == memcmp(out1.str().c_str() + SZ,
+                                              CTRL_BUF1 + SZ,
+                                              REST));
+                LOOP_ASSERT(LINE, 0 == memcmp(out2.str().c_str() + SZ,
+                                              CTRL_BUF2 + SZ,
+                                              REST));
             }
         }
       } break;
@@ -1078,7 +1132,7 @@ int main(int argc, char *argv[])
         //
         // Plan:
         //: 1 For each of a small representative set of object values, ordered
-        //:   by increasing length, use 'ostrstream' to write that object's
+        //:   by increasing length, use 'ostringstream' to write that object's
         //:   value to two separate character buffers each with different
         //:   initial values.  Compare the contents of these buffers with the
         //:   literal expected output format and verify that the characters
@@ -1134,31 +1188,29 @@ int main(int argc, char *argv[])
                 const char *const SPEC   = DATA[ti].d_spec_p;
                 const char *const FMT    = DATA[ti].d_fmt_p;
 
-                char buf1[SIZE], buf2[SIZE];
-                memcpy(buf1, CTRL_BUF1, SIZE); // Preset buf1 to Z1 values.
-                memcpy(buf2, CTRL_BUF2, SIZE); // Preset buf2 to Z2 values.
-
                 Obj        mX;
                 const Obj& X = gg(&mX, SPEC);
 
                 if (veryVerbose) { P_(SPEC) P(FMT) }
-                ostrstream out1(buf1, SIZE);
+                ostringstream out1(bsl::string(CTRL_BUF1, SIZE));
                 out1 << X << ends;
-                ostrstream out2(buf2, SIZE);
+                ostringstream out2(bsl::string(CTRL_BUF2, SIZE));
                 out2 << X << ends;
-                if (veryVerbose) { P(buf1) }
+                if (veryVerbose) { P(out1.str()) }
                 const int SZ   = strlen(FMT) + 1;
                 const int REST = SIZE - SZ;
                 LOOP2_ASSERT(LINE, ti, SZ < SIZE);  // Check buffer is large
                                                     // enough.
-                LOOP2_ASSERT(LINE, ti, Z1 == buf1[SIZE - 1]);  // Check for
-                                                               // overrun.
-                LOOP2_ASSERT(LINE, ti, Z2 == buf2[SIZE - 1]);  // Check for
-                                                               // overrun.
-                LOOP2_ASSERT(LINE, ti, 0 == memcmp(buf1 + SZ,
+                LOOP2_ASSERT(LINE,
+                             ti,
+                             Z1 == out1.str()[SIZE - 1]); // Check for overrun.
+                LOOP2_ASSERT(LINE,
+                             ti,
+                             Z2 == out2.str()[SIZE - 1]); // Check for overrun.
+                LOOP2_ASSERT(LINE, ti, 0 == memcmp(out1.str().c_str() + SZ,
                                                    CTRL_BUF1 + SZ,
                                                    REST));
-                LOOP2_ASSERT(LINE, ti, 0 == memcmp(buf2 + SZ,
+                LOOP2_ASSERT(LINE, ti, 0 == memcmp(out2.str().c_str() + SZ,
                                                    CTRL_BUF2 + SZ,
                                                    REST));
             }

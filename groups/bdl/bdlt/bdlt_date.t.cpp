@@ -1,7 +1,7 @@
 // bdlt_date.t.cpp                                                    -*-C++-*-
 #include <bdlt_date.h>
 
-#include <bdls_testutil.h>
+#include <bslim_testutil.h>
 
 #include <bslma_default.h>
 #include <bslma_defaultallocatorguard.h>
@@ -122,9 +122,10 @@ using namespace bsl;
 // [15] Date operator+(int numDays, const Date& date);
 // [15] Date operator-(const Date& date, int numDays);
 // [16] int operator-(const Date& lhs, const Date& rhs);
+// [20] hashAppend(HASHALG& hashAlg, const Date& date);
 // ----------------------------------------------------------------------------
 // [ 1] BREATHING TEST
-// [20] USAGE EXAMPLE
+// [21] USAGE EXAMPLE
 // [ *] CONCERN: This test driver is reusable w/other, similar components.
 // [ *] CONCERN: In no case does memory come from the global allocator.
 // [ *] CONCERN: In no case does memory come from the default allocator.
@@ -160,23 +161,23 @@ void aSsErT(bool condition, const char *message, int line)
 //               STANDARD BDE TEST DRIVER MACRO ABBREVIATIONS
 // ----------------------------------------------------------------------------
 
-#define ASSERT       BDLS_TESTUTIL_ASSERT
-#define ASSERTV      BDLS_TESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define LOOP_ASSERT  BDLS_TESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BDLS_TESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BDLS_TESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BDLS_TESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BDLS_TESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BDLS_TESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BDLS_TESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BDLS_TESTUTIL_LOOP6_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
 
-#define Q            BDLS_TESTUTIL_Q   // Quote identifier literally.
-#define P            BDLS_TESTUTIL_P   // Print identifier and value.
-#define P_           BDLS_TESTUTIL_P_  // P(X) without '\n'.
-#define T_           BDLS_TESTUTIL_T_  // Print a tab (w/o newline).
-#define L_           BDLS_TESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -343,7 +344,7 @@ int main(int argc, char *argv[])
     bslma::DefaultAllocatorGuard defaultAllocatorGuard(&defaultAllocator);
 
     switch (test) { case 0:
-      case 20: {
+      case 21: {
         // --------------------------------------------------------------------
         // USAGE EXAMPLE
         //   Extracted from component header file.
@@ -440,6 +441,95 @@ if (verbose)
 //..
 // on 'stdout'.
 
+      } break;
+      case 20: {
+        // --------------------------------------------------------------------
+        // TESTING: hashAppend
+        //
+        // Concerns:
+        //: 1 Hashes different inputs differently
+        //
+        //: 2 Hashes equal inputs identically
+        //
+        //: 3 Works for const and non-const dates
+        //
+        // Plan:
+        //: 1 Brute force test of a few hand picked values, ensuring that
+        //    hashes of equivalent values match and hashes of unequal values do
+        //    not.
+        //
+        // Testing:
+        //     hashAppend(HASHALG& hashAlg, const Date&  date);
+        // --------------------------------------------------------------------
+        if (verbose) cout << "\nTESTING 'hashAppend'"
+                          << "\n====================\n";
+
+        if (verbose) cout << "Brute force test of several dates." << endl;
+        {
+            typedef ::BloombergLP::bslh::Hash<> Hasher;
+
+            bdlt::Date d1; // P-1
+            bdlt::Date d2(1999, 12, 31);
+            bdlt::Date d3(1999, 12, 31);
+            bdlt::Date d4(1, 1, 2);
+            const bdlt::Date d5(1, 1, 2);
+            const bdlt::Date d6(1, 1, 3);
+
+            Hasher hasher;
+            Hasher::result_type a1 = hasher(d1), a2 = hasher(d2),
+                                a3 = hasher(d3), a4 = hasher(d4),
+                                a5 = hasher(d5), a6 = hasher(d6);
+
+            if (veryVerbose) {
+                cout << "\tHash of " << d1 << " is " << a1 << endl;
+                cout << "\tHash of " << d2 << " is " << a2 << endl;
+                cout << "\tHash of " << d3 << " is " << a3 << endl;
+                cout << "\tHash of " << d4 << " is " << a4 << endl;
+                cout << "\tHash of " << d5 << " is " << a5 << endl;
+                cout << "\tHash of " << d6 << " is " << a6 << endl;
+            }
+
+            ASSERT(a1 != a2);
+            ASSERT(a1 != a3);
+            ASSERT(a1 != a4);
+            ASSERT(a1 != a5);
+            ASSERT(a1 != a6);
+            if (veryVerbose) {
+                cout << "\td1/d2: " << int(a1 != a2)
+                     << ", d1/d3: " << int(a1 != a3)
+                     << ", d1/d4: " << int(a1 != a4)
+                     << ", d1/d5: " << int(a1 != a5)
+                     << ", d1/d6: " << int(a1 != a6) << endl;
+            }
+            ASSERT(a2 == a3);
+            ASSERT(a2 != a4);
+            ASSERT(a2 != a5);
+            ASSERT(a2 != a6);
+            if (veryVerbose) {
+                cout << "\td2/d3: " << int(a2 != a3)
+                     << ", d2/d4: " << int(a2 != a4)
+                     << ", d2/d5: " << int(a2 != a5)
+                     << ", d2/d6: " << int(a2 != a6) << endl;
+            }
+            ASSERT(a3 != a4);
+            ASSERT(a3 != a5);
+            ASSERT(a3 != a6);
+            if (veryVerbose) {
+                cout << "\td3/d4: " << int(a3 != a4)
+                     << ", d3/d5: " << int(a3 != a5)
+                     << ", d3/d6: " << int(a3 != a6) << endl;
+            }
+            ASSERT(a4 == a5);
+            ASSERT(a4 != a6);
+            if (veryVerbose) {
+                cout << "\td4/d5: " << int(a4 != a5)
+                     << ", d4/d6: " << int(a4 != a6) << endl;
+            }
+            ASSERT(a5 != a6);
+            if (veryVerbose) {
+                cout << "\td5/d6: " << int(a5 != a6) << endl;
+            }
+        }
       } break;
       case 19: {
         // --------------------------------------------------------------------

@@ -11,14 +11,14 @@ BSLS_IDENT("$Id: $")
 #include <bdlscm_version.h>
 #endif
 
-//@PURPOSE: Provide a value semantic type for Globally Unique Identifiers.
+//@PURPOSE: Provide a value-semantic type for Globally Unique Identifiers.
 //
 //@CLASSES:
 //  bdlb::Guid: value-semantic type to represent Globally Unique Identifiers
 //
 //@SEE_ALSO: bdlb_guidutil
 //
-//@DESCRIPTION: This component provides a value semantic type for Globally
+//@DESCRIPTION: This component provides a value-semantic type for Globally
 // Unique Identifiers (GUIDs), 'bdlb::Guid', with format as described by RFC
 // 4122 (<http://http://www.ietf.org/rfc/rfc4122.txt>).  All equality and
 // comparison methods are defined for these GUIDs.  Note that this component
@@ -358,6 +358,11 @@ bsl::ostream& operator<<(bsl::ostream& stream, const Guid& guid);
     //  print(stream, 0, -1);
     //..
 
+template <class HASH_ALGORITHM>
+void hashAppend(HASH_ALGORITHM& hashAlgorithm, const Guid& guid);
+    // Invoke the specified 'hashAlgorithm' on the underlying buffer held by
+    // the specified 'guid' object.
+
 // ============================================================================
 //                      INLINE DEFINITIONS
 // ============================================================================
@@ -538,6 +543,12 @@ bool bdlb::operator!=(const bdlb::Guid& lhs, const bdlb::Guid& rhs)
 {
     return !bsl::equal(
         lhs.d_buffer, lhs.d_buffer + lhs.k_GUID_NUM_BYTES, rhs.d_buffer);
+}
+
+template <class HASH_ALGORITHM>
+void bdlb::hashAppend(HASH_ALGORITHM& hashAlgorithm, const Guid& guid)
+{
+    hashAlgorithm(guid.data(), Guid::k_GUID_NUM_BYTES);
 }
 
 }  // close enterprise namespace

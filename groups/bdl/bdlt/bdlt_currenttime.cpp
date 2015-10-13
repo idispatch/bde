@@ -22,6 +22,16 @@ CurrentTime::s_currenttimeCallback_p =
                  { reinterpret_cast<void *>(CurrentTime::currentTimeDefault) };
 
 // CLASS METHODS
+DatetimeTz CurrentTime::asDatetimeTz()
+{
+    Datetime now = utc();
+    bsls::TimeInterval offset = LocalTimeOffset::localTimeOffset(now);
+    now.addSeconds(offset.totalSeconds());
+
+    BSLS_ASSERT((-1440                 < offset.totalMinutes()) &&
+                (offset.totalMinutes() < 1440));
+    return DatetimeTz(now, static_cast<int>(offset.totalMinutes()));
+}
 
                        // ** default callbacks **
 

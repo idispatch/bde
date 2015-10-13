@@ -63,7 +63,7 @@ BSLS_IDENT("$Id: $")
 // arbitrary size.  A pool is a concrete data structure used to organize and
 // supply memory according to specific needs (e.g., a consistent size).
 // Concrete allocators may use pools in their implementations, and pools will
-// aways take a base 'bslma::Allocator' protocol in their interface.  You can
+// always take a base 'bslma::Allocator' protocol in their interface.  You can
 // think of an allocator as a stream of memory that flows into a pool of
 // memory.  Memory is allocated from the pool until it is dry; only then does
 // new memory flow into the pool from the allocator.
@@ -126,8 +126,8 @@ BSLS_IDENT("$Id: $")
 // following subsections illustrate (1) use, and (2) implementation of the
 // abstract 'bslma::Allocator' base class:
 //
-///Usage 1: Container Objects
-///- - - - - - - - - - - - -
+///Example 1: Container Objects
+/// - - - - - - - - - - - - - -
 // Allocators are often supplied to objects requiring dynamically-allocated
 // memory at construction.  For example, consider the following
 // 'my_DoubleStack' class, parameterized by a 'bslma::Allocator':
@@ -272,8 +272,9 @@ BSLS_IDENT("$Id: $")
 //      d_size = proposedNewSize;                    // we're committed
 //  }
 //..
-///Usage 2: Derived Concrete Allocators
-///- - - - - - - - - - - - - - - - - -
+//
+///Example 2: Derived Concrete Allocators
+/// - - - - - - - - - - - - - - - - - - -
 // In order for the 'bslma::Allocator' interface to be useful, we must supply a
 // concrete allocator that implements it.  In this example we demonstrate how
 // to adapt 'operator new' and 'operator delete' to this protocol base class.

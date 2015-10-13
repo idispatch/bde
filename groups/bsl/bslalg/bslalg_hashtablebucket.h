@@ -72,7 +72,7 @@ BSLS_IDENT("$Id: $")
 // Then, we define our 'MyList' class, which will inherit from
 // 'bslalg::HashTableBucket'.  'MyList::Iterator' will be a public typedef of
 // 'MyList_Iterator'.  For brevity, we will omit a lot of functionality that a
-// full, general-purpose list class would have, implmenting only what we will
+// full, general-purpose list class would have, implementing only what we will
 // need for this example.
 //..
 //                                  // ======
@@ -112,7 +112,7 @@ BSLS_IDENT("$Id: $")
 //      void popBack();
 //  };
 //..
-// Next, we implment the functions for the iterator type.
+// Next, we implement the functions for the iterator type.
 //..
 //                              // ---------------
 //                              // MyList_Iterator
@@ -328,9 +328,9 @@ struct HashTableBucket {
         // Return the number of nodes in this hash bucket.
 };
 
-// ===========================================================================
+// ============================================================================
 //                               FREE OPERATORS
-// ===========================================================================
+// ============================================================================
 
 bool operator==(const HashTableBucket& lhs, const HashTableBucket& rhs);
     // Return 'true' if the specified hash table buckets 'lhs' and 'rhs' are
@@ -340,9 +340,9 @@ bool operator!=(const HashTableBucket& lhs, const HashTableBucket& rhs);
     // Return 'true' if the specified hash table buckets 'lhs' and 'rhs' are
     // not equivalent and 'false' otherwise.
 
-// ===========================================================================
+// ============================================================================
 //                  TEMPLATE AND INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                         //----------------------
                         // class HashTableBucket
@@ -400,7 +400,7 @@ BidirectionalLink *HashTableBucket::last() const
     return d_last_p;
 }
 
-}  // close namespace bslalg
+}  // close package namespace
 
 // FREE OPERATORS
 inline

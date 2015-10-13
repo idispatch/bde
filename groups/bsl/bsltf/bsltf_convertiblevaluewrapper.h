@@ -10,7 +10,7 @@ BSLS_IDENT("$Id: $")
 //@PURPOSE: Provide a wrapper class, convertible to a supplied value.
 //
 //@CLASSES:
-//   bsltf::ConvertibleValueWrapper: wrapper of a value semantic class
+//   bsltf::ConvertibleValueWrapper: wrapper of a value-semantic class
 //
 //@SEE_ALSO: bsltf_templatetestfacility
 //
@@ -26,8 +26,8 @@ BSLS_IDENT("$Id: $")
 ///-----
 // This section illustrates intended use of this component.
 //
-///Example 1: (TBD)
-/// - - - - - - - - - - - - - - - -
+///Example 1: TBD
+/// - - - - - - -
 
 #ifndef INCLUDED_BSLSCM_VERSION
 #include <bslscm_version.h>
@@ -68,9 +68,9 @@ struct ConvertibleValueWrapper {
 };
 
 
-// ===========================================================================
+// ============================================================================
 //                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS
-// ===========================================================================
+// ============================================================================
 
 
                        // -----------------------------

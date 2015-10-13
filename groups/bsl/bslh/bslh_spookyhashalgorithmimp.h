@@ -198,10 +198,9 @@ BSLS_IDENT("$Id: $")
 //: 14 Made function names lower case (had to change 'Final' to 'finalize' and
 //:    'Short' to 'shortHash' to avoid using a keyword)
 //
+///Third-Party Documentation
+///-------------------------
 //..
-///Third Party Doc
-///---------------
-//
 // SpookyHash: a 128-bit non cryptographic hash function
 //
 // By Bob Jenkins, public domain
@@ -242,8 +241,9 @@ BSLS_IDENT("$Id: $")
 #include <bsls_types.h>
 #endif
 
-#ifndef INCLUDED_STDDEF
+#ifndef INCLUDED_STDDEF_H
 #include <stddef.h>    // 'size_t'
+#define INCLUDED_STDDEF_H
 #endif
 
 namespace BloombergLP {

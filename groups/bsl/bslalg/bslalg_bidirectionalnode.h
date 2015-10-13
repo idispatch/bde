@@ -107,7 +107,7 @@ BSLS_IDENT("$Id: $")
 //  bool operator!=(MyList_Iterator<PAYLOAD> lhs,
 //                  MyList_Iterator<PAYLOAD> rhs);
 //..
-// Then, we implment the functions for the iterator type.
+// Then, we implement the functions for the iterator type.
 //..
 //                                  // ---------------
 //                                  // MyList_Iterator
@@ -348,9 +348,9 @@ class BidirectionalNode : public bslalg::BidirectionalLink {
         // held by this object.
 };
 
-// ===========================================================================
+// ============================================================================
 //                  TEMPLATE AND INLINE FUNCTION DEFINITIONS
-// ===========================================================================
+// ============================================================================
 
                         // -----------------------
                         // class BidirectionalNode
@@ -370,7 +370,7 @@ const VALUE& BidirectionalNode<VALUE>::value() const
     return d_value;
 }
 
-}  // close namespace bslalg
+}  // close package namespace
 
 }  // close enterprise namespace
 

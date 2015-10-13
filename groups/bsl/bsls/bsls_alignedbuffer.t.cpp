@@ -6,6 +6,7 @@
 #include <bsls_alignmentfromtype.h>
 #include <bsls_alignmentutil.h>
 
+#include <stddef.h>
 #include <cstdio>
 #include <cstdlib>
 
@@ -29,9 +30,9 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-//==========================================================================
+//=============================================================================
 //                  STANDARD BDE ASSERT TEST MACRO
-//--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // NOTE: THIS IS A LOW-LEVEL COMPONENT AND MAY NOT USE ANY C++ LIBRARY
 // FUNCTIONS, INCLUDING IOSTREAMS.
 static int testStatus = 0;
@@ -44,7 +45,7 @@ static void aSsErT(int c, const char *s, int i) {
 }
 
 # define ASSERT(X) { aSsErT(!(X), #X, __LINE__); }
-//--------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 //=============================================================================
 //                  SEMI-STANDARD TEST OUTPUT MACROS
@@ -81,7 +82,7 @@ enum { VERBOSE_ARG_NUM = 2, VERY_VERBOSE_ARG_NUM, VERY_VERY_VERBOSE_ARG_NUM };
     static void *allocateFromBuffer(int size)
     {
         if (size > my_AllocEnd - my_AllocPtr)
-            return 0;       // Out of buffer space
+            return 0;       // Out of buffer space                    // RETURN
 
         void *result = my_AllocPtr;
         my_AllocPtr += size;
@@ -122,7 +123,7 @@ enum { VERBOSE_ARG_NUM = 2, VERY_VERBOSE_ARG_NUM, VERY_VERY_VERBOSE_ARG_NUM };
 
         if (!charPtr || !shortPtr || !objPtr) {
             fprintf(stderr, "Global buffer is not large enough.\n");
-            return -1;
+            return -1;                                                // RETURN
         }
 
         // ...
@@ -181,12 +182,12 @@ int main(int argc, char *argv[])
         //   const char *buffer() const;
         // --------------------------------------------------------------------
 
-#       define TEST_METHODS(SIZE, ALIGNMENT) \
-            do { \
-                bsls::AlignedBuffer<SIZE, ALIGNMENT> buff; \
-                const bsls::AlignedBuffer<SIZE, ALIGNMENT>& BUFF = buff; \
-                ASSERT((const char*) &BUFF == buff.buffer()); \
-                ASSERT((const char*) &BUFF == BUFF.buffer()); \
+#       define TEST_METHODS(SIZE, ALIGNMENT)                                  \
+            do {                                                              \
+                bsls::AlignedBuffer<SIZE, ALIGNMENT> buff;                    \
+                const bsls::AlignedBuffer<SIZE, ALIGNMENT>& BUFF = buff;      \
+                ASSERT((const char*) &BUFF == buff.buffer());                 \
+                ASSERT((const char*) &BUFF == BUFF.buffer());                 \
             } while (false)
 
         TEST_METHODS(1, 1);
@@ -230,14 +231,22 @@ int main(int argc, char *argv[])
 
         if (verbose) printf("\nTESTING CLASS INVARIANTS"
                             "\n========================\n");
+#if defined(BSLS_PLATFORM_CMP_MSVC)
+#define ASSERT_ALIGN(TYPE, ALIGNMENT) ASSERT(__alignof(TYPE) == ALIGNMENT);
+#else
+#define ASSERT_ALIGN(TYPE, ALIGNMENT) ASSERT(__alignof__(TYPE) == ALIGNMENT);
+#endif
 
-#       define TEST_INVARIANTS(SIZE, ALIGNMENT) \
-            do { \
-              typedef bsls::AlignedBuffer<SIZE, ALIGNMENT> Buff;  \
-              ASSERT(bsls::AlignmentFromType<Buff>::VALUE == (int) ALIGNMENT);\
-              ASSERT(sizeof(Buff) >= SIZE); \
-              ASSERT(sizeof(Buff) % ALIGNMENT == 0); \
-              ASSERT(sizeof(Buff) - SIZE < (int) ALIGNMENT); \
+#       define TEST_INVARIANTS(SIZE, ALIGNMENT)                               \
+            do {                                                              \
+              typedef bsls::AlignedBuffer<SIZE, ALIGNMENT> Buff;              \
+              Buff buffer;                                                    \
+              ASSERT(reinterpret_cast<size_t>(&buffer) % ALIGNMENT == 0);     \
+              ASSERT(bsls::AlignmentFromType<Buff>::VALUE == (int)ALIGNMENT); \
+              ASSERT(sizeof(Buff) >= SIZE);                                   \
+              ASSERT(sizeof(Buff) % ALIGNMENT == 0);                          \
+              ASSERT(sizeof(Buff) - SIZE < (int) ALIGNMENT);                  \
+              ASSERT_ALIGN(Buff, ALIGNMENT);                                  \
             } while (0)
 
         TEST_INVARIANTS(1, 1);

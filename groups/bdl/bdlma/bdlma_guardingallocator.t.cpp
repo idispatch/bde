@@ -1,7 +1,7 @@
 // bdlma_guardingallocator.t.cpp                                      -*-C++-*-
 #include <bdlma_guardingallocator.h>
 
-#include <bdls_testutil.h>
+#include <bslim_testutil.h>
 
 #include <bslma_defaultallocatorguard.h>
 #include <bslma_testallocator.h>
@@ -46,7 +46,7 @@ using namespace bsl;
 // in this test driver.
 // ----------------------------------------------------------------------------
 // CREATORS
-// [ 2] GuardingAllocator(GuardPageLocation loc = e_AFTER_USER_BLOCK);
+// [ 2] GuardingAllocator(GuardPageLocation l = e_AFTER_USER_BLOCK);
 // [ 2] ~GuardingAllocator();
 //
 // MANIPULATORS
@@ -81,22 +81,22 @@ void aSsErT(int c, const char *s, int i)
 //                       STANDARD BDE TEST DRIVER MACROS
 // ----------------------------------------------------------------------------
 
-#define ASSERT       BDLS_TESTUTIL_ASSERT
-#define LOOP_ASSERT  BDLS_TESTUTIL_LOOP_ASSERT
-#define LOOP0_ASSERT BDLS_TESTUTIL_LOOP0_ASSERT
-#define LOOP1_ASSERT BDLS_TESTUTIL_LOOP1_ASSERT
-#define LOOP2_ASSERT BDLS_TESTUTIL_LOOP2_ASSERT
-#define LOOP3_ASSERT BDLS_TESTUTIL_LOOP3_ASSERT
-#define LOOP4_ASSERT BDLS_TESTUTIL_LOOP4_ASSERT
-#define LOOP5_ASSERT BDLS_TESTUTIL_LOOP5_ASSERT
-#define LOOP6_ASSERT BDLS_TESTUTIL_LOOP6_ASSERT
-#define ASSERTV      BDLS_TESTUTIL_ASSERTV
+#define ASSERT       BSLIM_TESTUTIL_ASSERT
+#define LOOP_ASSERT  BSLIM_TESTUTIL_LOOP_ASSERT
+#define LOOP0_ASSERT BSLIM_TESTUTIL_LOOP0_ASSERT
+#define LOOP1_ASSERT BSLIM_TESTUTIL_LOOP1_ASSERT
+#define LOOP2_ASSERT BSLIM_TESTUTIL_LOOP2_ASSERT
+#define LOOP3_ASSERT BSLIM_TESTUTIL_LOOP3_ASSERT
+#define LOOP4_ASSERT BSLIM_TESTUTIL_LOOP4_ASSERT
+#define LOOP5_ASSERT BSLIM_TESTUTIL_LOOP5_ASSERT
+#define LOOP6_ASSERT BSLIM_TESTUTIL_LOOP6_ASSERT
+#define ASSERTV      BSLIM_TESTUTIL_ASSERTV
 
-#define Q   BDLS_TESTUTIL_Q   // Quote identifier literally.
-#define P   BDLS_TESTUTIL_P   // Print identifier and value.
-#define P_  BDLS_TESTUTIL_P_  // P(X) without '\n'.
-#define T_  BDLS_TESTUTIL_T_  // Print a tab (w/o newline).
-#define L_  BDLS_TESTUTIL_L_  // current Line number
+#define Q            BSLIM_TESTUTIL_Q   // Quote identifier literally.
+#define P            BSLIM_TESTUTIL_P   // Print identifier and value.
+#define P_           BSLIM_TESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLIM_TESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLIM_TESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  GLOBAL VARIABLES / TYPEDEFS FOR TESTING
@@ -220,7 +220,7 @@ struct AfterUserBlockDeallocationData
     // guard page location is 'e_AFTER_USER_BLOCK'.
 {
     void *d_firstPage; // address we need to deallocate
-    void *d_guardPage; // address of the page we need to unprotect
+    void *d_guardPage; // address of the page we need to un-protect
 };
 
 AfterUserBlockDeallocationData *getDataBlockAddress(void *address)
@@ -243,12 +243,12 @@ void *guardPageAddress(void *address, Enum location, int pageSize)
         AfterUserBlockDeallocationData *deallocData =
             getDataBlockAddress(address);
 
-        return deallocData->d_guardPage;
+        return deallocData->d_guardPage;                              // RETURN
     }
     else {
         ASSERT(Obj::e_BEFORE_USER_BLOCK == location);
 
-        return static_cast<char *>(address) - pageSize;
+        return static_cast<char *>(address) - pageSize;               // RETURN
     }
 }
 
@@ -283,14 +283,14 @@ void overwritePadding(void *address, int size, Enum location, int pageSize)
     // Also note that this method is based on the implementation of 'allocate'.
 {
     const int roundedUpSize =
-                          bsls::AlignmentUtil::roundUpToMaximalAlignment(size);
+        static_cast<int>(bsls::AlignmentUtil::roundUpToMaximalAlignment(size));
 
     // Adjust for additional memory needed to stash reference addresses when
     // 'e_AFTER_USER_BLOCK' is in use.
 
     const int adjustedSize = Obj::e_AFTER_USER_BLOCK == location
-                             ? roundedUpSize + OFFSET * 2
-                             : roundedUpSize;
+                           ? roundedUpSize + static_cast<int>(OFFSET) * 2
+                           : roundedUpSize;
 
     // Calculate the number of pages required for 'adjustedSize'.
 
@@ -316,13 +316,13 @@ void overwritePadding(void *address, int size, Enum location, int pageSize)
 }
 
 static
-ThreadId createThread(ThreadFunction func, void *arg)
+ThreadId createThread(ThreadFunction function, void *arg)
 {
 #ifdef BSLS_PLATFORM_OS_WINDOWS
-    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)func, arg, 0, 0);
+    return CreateThread(0, 0, (LPTHREAD_START_ROUTINE)function, arg, 0, 0);
 #else
     ThreadId id;
-    pthread_create(&id, 0, func, arg);
+    pthread_create(&id, 0, function, arg);
     return id;
 #endif
 }
@@ -490,13 +490,16 @@ extern "C" void *threadFunction3(void *arg)
         static int outputSize(my_DataStyle outputStyle,
                               my_DataStyle inputStyle,
                               int          inputLength);
-           // Return the buffer size (in bytes) required to store the result of
-           // converting input data of the specified 'inputLength' (in bytes),
-           // in the specified 'inputStyle', into the specified 'outputStyle'.
-           // The behavior is undefined unless '0 <= inputLength'.
+            // Return the buffer size (in bytes) required to store the result
+            // of converting input data of the specified 'inputLength' (in
+            // bytes), in the specified 'inputStyle', into the specified
+            // 'outputStyle'.  The behavior is undefined unless
+            // '0 <= inputLength'.
 
-        static int translate(      char *output, my_DataStyle outputStyle,
-                             const char *input,  my_DataStyle inputStyle);
+        static int translate(char         *output,
+                             my_DataStyle  outputStyle,
+                             const char   *input,
+                             my_DataStyle  inputStyle);
             // Load into the specified 'output' buffer the result of converting
             // the specified 'input' data, in the specified 'inputStyle', into
             // the specified 'outputStyle'.  Return 0 on success, and a
@@ -519,6 +522,10 @@ extern "C" void *threadFunction3(void *arg)
         my_DataStyle      d_altStyle;    // alternative style (if requested)
         char             *d_altBuffer;   // buffer for alternative style
         bslma::Allocator *d_allocator_p; // memory allocator (held, not owned)
+
+      private:
+        // Not implemented:
+        my_DataHandler(const my_DataHandler&);
 
       public:
         // CREATORS
@@ -581,9 +588,7 @@ extern "C" void *threadFunction3(void *arg)
         int altLength = my_DataTranslationUtil::outputSize(alternateStyle,
                                                            d_inStyle,
                                                            d_inCapacity);
-// Start Usage example augmentation.
         (void)altLength;
-// End Usage example augmentation.
 
         // Oops!  Should have used 'altLength'.
         char *tmpAltBuffer = (char *)d_allocator_p->allocate(d_inCapacity);
@@ -638,8 +643,10 @@ int my_DataTranslationUtil::outputSize(my_DataStyle outputStyle,
     return 2 * inputLength;
 }
 
-int my_DataTranslationUtil::translate(  char *output, my_DataStyle outputStyle,
-                                  const char *input,  my_DataStyle inputStyle)
+int my_DataTranslationUtil::translate(char         *output,
+                                      my_DataStyle  outputStyle,
+                                      const char   *input,
+                                      my_DataStyle  inputStyle)
 {
     (void)outputStyle;
     (void)inputStyle;
@@ -730,14 +737,16 @@ int main(int argc, char *argv[])
 #endif
 // End Usage example augmentation.
 
-// Next, we define some data (in 'e_STYLE_A') and define a 'my_DataHandler'
-// object, 'handler', to process that data.  Note that our 'handler' object
-// uses the default allocator:
+// Next, we define some data (in 'e_STYLE_A'):
 //..
     const char *input = "AAAAAAAAAAAAAAA@";  // data always terminated with '@'
-
+//..
+// Then, we define a 'my_DataHandler' object, 'handler', to process that data:
+//..
 //  my_DataHandler handler(input, 16, e_STYLE_A);
 //..
+// Note that our 'handler' object uses the default allocator.
+//
 // Next, we request that an alternate data style, 'e_STYLE_AA', be generated by
 // 'handler'.  Unfortunately, data in style 'e_STYLE_AA' is twice as large as
 // that in style 'e_STYLE_A' making it a virtual certainty that the program
@@ -749,7 +758,7 @@ int main(int argc, char *argv[])
 //      // use data in alternate style
 //  }
 //..
-// Suppose that after performing a brief post mortem on the resulting core
+// Suppose that after performing a brief post-mortem on the resulting core
 // file, we strongly suspect that a buffer overrun is the root cause, but the
 // program crashed in a context far removed from that of the source of the
 // problem (which is often the case with buffer overrun issues).
@@ -868,8 +877,8 @@ int main(int argc, char *argv[])
         //:
         //: 6 'deallocate' returns memory back to the system facility.
         //:
-        //: 7 'deallocate' unprotects the guard page associated with the memory
-        //:   block.
+        //: 7 'deallocate' un-protects the guard page associated with the
+        //:   memory block.
         //:
         //: 8 Calling 'deallocate' with 0 has no effect.
         //:
@@ -1149,7 +1158,7 @@ int main(int argc, char *argv[])
         //:   effect on any outstanding allocated memory.  (C-4)
         //
         // Testing:
-        //   GuardingAllocator(GuardPageLocation loc = e_AFTER_USER_BLOCK);
+        //   GuardingAllocator(GuardPageLocation l = e_AFTER_USER_BLOCK);
         //   ~GuardingAllocator();
         // --------------------------------------------------------------------
 
@@ -1194,8 +1203,8 @@ int main(int argc, char *argv[])
             LOOP2_ASSERT(CONFIG, da.numBlocksTotal(),
                          0 == da.numBlocksTotal());
 
-            // Verify we can allocate from the object and write to the
-            // returned memory block.
+            // Verify we can allocate from the object and write to the returned
+            // memory block.
 
             void *p = mX.allocate(SIZE);
             LOOP2_ASSERT(CONFIG, p, p);
@@ -1403,7 +1412,7 @@ int main(int argc, char *argv[])
 }
 
 // ----------------------------------------------------------------------------
-// Copyright 2013 Bloomberg Finance L.P.
+// Copyright 2015 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

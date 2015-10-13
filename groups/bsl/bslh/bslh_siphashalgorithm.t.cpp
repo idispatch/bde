@@ -51,34 +51,38 @@ using namespace bslh;
 // ----------------------------------------------------------------------------
 // [ 1] BREATHING TEST
 // [ 6] Trait IsBitwiseMoveable
-// [ 7] USAGE EXAMPLE
+// [ 7] Byte-order independence
+// [ 8] USAGE EXAMPLE
 //-----------------------------------------------------------------------------
 
 // ============================================================================
-//                      STANDARD BDE ASSERT TEST MACROS
+//                     STANDARD BSL ASSERT TEST FUNCTION
 // ----------------------------------------------------------------------------
-// NOTE: THIS IS A LOW-LEVEL COMPONENT AND MAY NOT USE ANY C++ LIBRARY
-// FUNCTIONS, INCLUDING IOSTREAMS.
 
 namespace {
 
 int testStatus = 0;
 
-void aSsErT(bool b, const char *s, int i)
+void aSsErT(bool condition, const char *message, int line)
 {
-    if (b) {
-        printf("Error " __FILE__ "(%d): %s    (failed)\n", i, s);
-        if (testStatus >= 0 && testStatus <= 100) ++testStatus;
+    if (condition) {
+        printf("Error " __FILE__ "(%d): %s    (failed)\n", line, message);
+
+        if (0 <= testStatus && testStatus <= 100) {
+            ++testStatus;
+        }
     }
 }
 
 }  // close unnamed namespace
 
 // ============================================================================
-//                      STANDARD BDE TEST DRIVER MACROS
+//               STANDARD BSL TEST DRIVER MACRO ABBREVIATIONS
 // ----------------------------------------------------------------------------
 
 #define ASSERT       BSLS_BSLTESTUTIL_ASSERT
+#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
+
 #define LOOP_ASSERT  BSLS_BSLTESTUTIL_LOOP_ASSERT
 #define LOOP0_ASSERT BSLS_BSLTESTUTIL_LOOP0_ASSERT
 #define LOOP1_ASSERT BSLS_BSLTESTUTIL_LOOP1_ASSERT
@@ -87,13 +91,12 @@ void aSsErT(bool b, const char *s, int i)
 #define LOOP4_ASSERT BSLS_BSLTESTUTIL_LOOP4_ASSERT
 #define LOOP5_ASSERT BSLS_BSLTESTUTIL_LOOP5_ASSERT
 #define LOOP6_ASSERT BSLS_BSLTESTUTIL_LOOP6_ASSERT
-#define ASSERTV      BSLS_BSLTESTUTIL_ASSERTV
 
-#define Q   BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
-#define P   BSLS_BSLTESTUTIL_P   // Print identifier and value.
-#define P_  BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
-#define T_  BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
-#define L_  BSLS_BSLTESTUTIL_L_  // current Line number
+#define Q            BSLS_BSLTESTUTIL_Q   // Quote identifier literally.
+#define P            BSLS_BSLTESTUTIL_P   // Print identifier and value.
+#define P_           BSLS_BSLTESTUTIL_P_  // P(X) without '\n'.
+#define T_           BSLS_BSLTESTUTIL_T_  // Print a tab (w/o newline).
+#define L_           BSLS_BSLTESTUTIL_L_  // current Line number
 
 // ============================================================================
 //                  NEGATIVE-TEST MACRO ABBREVIATIONS
@@ -402,10 +405,14 @@ int main(int argc, char *argv[])
     bool             verbose = argc > 2;
     bool         veryVerbose = argc > 3;
     bool     veryVeryVerbose = argc > 4;
-//  bool veryVeryVeryVerbose = argc > 5;
+    bool veryVeryVeryVerbose = argc > 5;
+
+    (void)veryVeryVeryVerbose;  // suppress warning
+
+    printf("TEST " __FILE__ " CASE %d\n", test);
 
     switch (test) { case 0:
-      case 7: {
+      case 8: {
         // --------------------------------------------------------------------
         // USAGE EXAMPLE
         //   The hashing algorithm can be used to create more powerful
@@ -455,6 +462,68 @@ int main(int argc, char *argv[])
         ASSERT(!hashTable.contains(Future("Swiss Franc", 'X', 2014)));
         ASSERT(!hashTable.contains(Future("US Dollar", 'F', 2014)));
 
+      } break;
+      case 7: {
+        // --------------------------------------------------------------------
+        // HASH SEED INDEPENDENT OF BYTE ORDER
+        //   The hash seed should produce the same hash results (on character
+        //   strings) regardless of architecture byte order.
+        //
+        // Concerns:
+        //: 1 Since the seed is given as an array of bytes, we want to insure
+        //:   that the results of hashing (similarly byte-orde-independent)
+        //:   character strings is the same regardless of the byte ordering
+        //:   used for integers.
+        //
+        // Plan:
+        //: 1 Seed the algorithm with a value that represents different 128-bit
+        //:   values on different architectures, and verify that the algorithm
+        //:   produces a known hash value independently of those.
+        //
+        // Testing:
+        //    Byte-order independence
+        // --------------------------------------------------------------------
+
+        if (verbose) printf("\nHASH SEED INDEPENDENT OF BYTE ORDER"
+                            "\n===================================\n");
+        static const struct {
+            int                 d_line;
+            const char          d_seed[16];
+            const char         *d_value;
+            int                 d_length;
+            bsls::Types::Uint64 d_expectedHash;
+        } DATA[] = {
+        //     LINE  SEED VALUE LENGTH EXPECTEDHASH
+            {  L_,   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+                          "\0\1\2\3\4\5\6\7\10\11\12\13\14\15\16",
+                                15,    0xa129ca6149be45e5ULL                 },
+            {  L_,   { '0', '1', '2', '3', '4', '5', '6', '7',
+                       '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',  },
+                          "a",  1,     12398370950267227270ULL               },
+            {  L_,   { '\xef', '\xbe', '\xad', '\xde',
+                       '\xbe', '\xba', '\xfe', '\xca',
+                       '\x0d', '\xf0', '\xad', '\x8b',
+                       '\x02', '\xb0', '\xad', '\x1b',  },
+                          "Short test message",
+                                18,    0xf2e893485bd3badeULL                 },
+        };
+        const int NUM_DATA = sizeof DATA / sizeof *DATA;
+
+        for (int i = 0; i != NUM_DATA; ++i) {
+            const int                  LINE   = DATA[i].d_line;
+            const char                *SEED   = DATA[i].d_seed;
+            const char                *VALUE  = DATA[i].d_value;
+            const int                  LENGTH = DATA[i].d_length;
+            const bsls::Types::Uint64  EXP    = DATA[i].d_expectedHash;
+
+            Obj hasher(SEED);
+            hasher(VALUE, LENGTH);
+            bsls::Types::Uint64 hash = hasher.computeHash();
+            if (veryVerbose) {
+                P_(LINE) P_(SEED) P_(VALUE) P_(EXP) P(hash)
+            }
+            ASSERTV(LINE, hash, EXP, EXP == hash);
+        }
       } break;
       case 6: {
         // --------------------------------------------------------------------
@@ -551,7 +620,7 @@ int main(int argc, char *argv[])
         {
             Obj::result_type (Obj::*expectedSignature) ();
 
-            expectedSignature = &Obj::computeHash;
+            (void)(expectedSignature = &Obj::computeHash);
         }
 
       } break;
@@ -860,6 +929,27 @@ int main(int argc, char *argv[])
             hashAlg1(&int1, sizeof(int));
             hashAlg2(&int2, sizeof(int));
             ASSERT(hashAlg1.computeHash() == hashAlg2.computeHash());
+        }
+      } break;
+      case -1: {
+        // --------------------------------------------------------------------
+        // EXAMINE HASH VALUES
+        //   This case prints out hash values of the argument strings using a
+        //   fixed seed.  It is intended to demonstrate that the same strings
+        //   hash to the same values regardless of native byte ordering.
+        // --------------------------------------------------------------------
+
+        if (verbose) printf("\nEXAMINE HASH VALUES"
+                            "\n===================\n");
+
+        unsigned char seed[16] = {
+            0x1B, 0x91, 0x7C, 0x2A, 0x70, 0xAB, 0x10, 0xF5,
+            0xF8, 0x37, 0x47, 0xC1, 0xF7, 0x00, 0x09, 0xF3,
+        };
+        for (int i = 1; i < argc; ++i) {
+            SipHashAlgorithm hashAlg(reinterpret_cast<char *>(seed));
+            hashAlg(argv[i], strlen(argv[i]));
+            P_(argv[i]) P(hashAlg.computeHash())
         }
       } break;
       default: {
